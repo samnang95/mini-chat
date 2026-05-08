@@ -1,0 +1,24 @@
+{
+  "app_name": "Mini Chat",
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "fill_all_fields": "Please fill in all fields",
+    "login_success": "Login successful",
+    "logout": "Logout"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "error": "Error",
+    "loading": "Loading...",
+    "retry": "Retry"
+  },
+  "settings": {
+    "language": "Language",
+    "english": "English",
+    "khmer": "ខ្មែរ"
+  }
+}
