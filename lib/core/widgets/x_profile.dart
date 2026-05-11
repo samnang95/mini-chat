@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
-import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 
 class XProfile extends StatelessWidget {
@@ -10,20 +9,24 @@ class XProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       height: height * 0.1,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.primaryLightest,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                const BoxShadow(
+                  color: Color(0x1A000000), // 10% black
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -44,13 +47,14 @@ class XProfile extends StatelessWidget {
                     "Rin Samnang",
                     style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     "@Samanng_rin",
                     style: AppTypography.bodySmall.copyWith(
-                      color: Colors.black54,
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -60,15 +64,13 @@ class XProfile extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 24),
             child: Container(
-              padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 6,
-                bottom: 6,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
               ),
-              decoration: const BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.horizontal(
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: const BorderRadius.horizontal(
                   left: Radius.circular(10),
                   right: Radius.circular(10),
                 ),
@@ -76,7 +78,7 @@ class XProfile extends StatelessWidget {
               child: Text(
                 "Pro",
                 style: AppTypography.bodySmall.copyWith(
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                   fontSize: 10,
                 ),

@@ -14,7 +14,7 @@ abstract class AppTheme {
         fontFamily: AppTypography.fontFamily,
 
         // ── Colors ───────────────────────────────────────
-        colorScheme: const ColorScheme.light(
+        colorScheme: ColorScheme.light(
           primary: AppColors.primary,
           primaryContainer: AppColors.primaryLight,
           secondary: AppColors.secondary,
@@ -224,7 +224,7 @@ abstract class AppTheme {
         fontFamily: AppTypography.fontFamily,
 
         // ── Colors ───────────────────────────────────────
-        colorScheme: const ColorScheme.dark(
+        colorScheme: ColorScheme.dark(
           primary: AppColors.primaryLight,
           primaryContainer: AppColors.primaryDark,
           secondary: AppColors.secondaryLight,

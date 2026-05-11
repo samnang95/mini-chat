@@ -1,8 +1,29 @@
 {
   "app_name": "មីនី ឆាត",
+  "auth": {
+    "logout": "ចេញ"
+  },
   "splash": {
     "tagline": "ងាយស្រួល ច្បាស់លាស់ កក់ក្ដៅ",
     "installing": "កំពុងដំឡើង...",
     "product_of": "ផលិតផលរបស់"
+  },
+  "settings": {
+    "title": "ការកំណត់",
+    "preferences": "ចំណូលចិត្ត",
+    "support": "ជំនួយ",
+    "account": "គណនី",
+    "privacy_and_security": "ឯកជនភាព និង សុវត្ថិភាព",
+    "chat_settings": "ការកំណត់ឆាត",
+    "appearance": "រូបរាង",
+    "help_center": "មជ្ឈមណ្ឌលជំនួយ",
+    "translation": "បកប្រែ"
+  },
+  "language": {
+    "select_language": "ជ្រើសរើសភាសា",
+    "confirm": "យល់ព្រម",
+    "english": "អង់គ្លេស",
+    "khmer": "ខ្មែរ",
+    "chinese": "ចិន"
   }
 }

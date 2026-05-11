@@ -1,0 +1,29 @@
+{
+  "app_name": "迷你聊天",
+  "auth": {
+    "logout": "登出"
+  },
+  "splash": {
+    "tagline": "轻松。清晰。温暖。",
+    "installing": "安装中...",
+    "product_of": "产品来自"
+  },
+  "settings": {
+    "title": "设置",
+    "preferences": "偏好",
+    "support": "支持",
+    "account": "账户",
+    "privacy_and_security": "隐私与安全",
+    "chat_settings": "聊天设置",
+    "appearance": "外观",
+    "help_center": "帮助中心",
+    "translation": "翻译"
+  },
+  "language": {
+    "select_language": "选择语言",
+    "confirm": "确认",
+    "english": "英文",
+    "khmer": "高棉文",
+    "chinese": "中文"
+  }
+}

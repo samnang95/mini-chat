@@ -4,7 +4,7 @@ import 'package:mini_chat/app/config/env_config.dart';
 import 'package:mini_chat/core/network/api_client.dart';
 import 'package:mini_chat/core/network/api_endpoints.dart';
 import 'package:mini_chat/core/network/api_interceptors.dart';
-import 'package:mini_chat/features/settings/controllers/language_controller.dart';
+import 'package:mini_chat/features/language/language_controller.dart';
 
 class InitialBinding extends Bindings {
   @override
