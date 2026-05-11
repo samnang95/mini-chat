@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 /// Centralized color palette for the app.
 /// Use these constants everywhere instead of raw Color values.
 abstract class AppColors {
-  // ── Brand ───────────────────────────────────────────────
-  static const primary = Color(0xFF7C77FF);
-  static const primaryLight = Color(0xFFA29BFE);
-  static const primaryDark = Color(0xFF5A55C4);
-
+  // ── Brand (Primary Shades) ──────────────────────────────
+  static const primaryLightest = Color(0xFFF0EFFF);
+  static const primaryLighter = Color(0xFFD2D1FF);
+  static const primaryLight = Color(0xFFA7A5FF);
+  static const primary = Color(0xFF7C77FF); // Base
+  static const primaryDark = Color(0xFF4E43FF);
+  static const primaryDarker = Color(0xFF2100DD);
+  static const primaryDarkest = Color(0xFF0F0082);
   static const secondary = Color(0xFF00CEC9);
   static const secondaryLight = Color(0xFF81ECEC);
   static const secondaryDark = Color(0xFF00B894);
-
+    
   // ── Accent ──────────────────────────────────────────────
   static const accent = Color(0xFFFD79A8);
 

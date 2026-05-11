@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Centralized text styles.
-/// Usage: Text('Hello', style: AppTypography.heading1)
 abstract class AppTypography {
   // ── Font Family ─────────────────────────────────────────
   static const fontFamily = 'Inter';

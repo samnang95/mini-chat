@@ -1,24 +1,8 @@
 {
   "app_name": "មីនី ឆាត",
-  "auth": {
-    "login": "ចូល",
-    "register": "ចុះឈ្មោះ",
-    "email": "អ៊ីមែល",
-    "password": "ពាក្យសម្ងាត់",
-    "fill_all_fields": "សូមបំពេញគ្រប់ប្រអប់",
-    "login_success": "ចូលបានដោយជោគជ័យ",
-    "logout": "ចាកចេញ"
-  },
-  "common": {
-    "ok": "យល់ព្រម",
-    "cancel": "បោះបង់",
-    "error": "កំហុស",
-    "loading": "កំពុងផ្ទុក...",
-    "retry": "ព្យាយាមម្ដងទៀត"
-  },
-  "settings": {
-    "language": "ភាសា",
-    "english": "English",
-    "khmer": "ខ្មែរ"
+  "splash": {
+    "tagline": "ងាយស្រួល ច្បាស់លាស់ កក់ក្ដៅ",
+    "installing": "កំពុងដំឡើង...",
+    "product_of": "ផលិតផលរបស់"
   }
 }
