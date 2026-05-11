@@ -4,6 +4,8 @@ import 'package:mini_chat/features/home/home_binding.dart';
 import 'package:mini_chat/features/home/home_page.dart';
 import 'package:mini_chat/features/language/language_binding.dart';
 import 'package:mini_chat/features/language/language_page.dart';
+import 'package:mini_chat/features/main/main_binding.dart';
+import 'package:mini_chat/features/main/main_page.dart';
 import 'package:mini_chat/features/settings/settings_binding.dart';
 import 'package:mini_chat/features/settings/settings_page.dart';
 import 'package:mini_chat/features/splash/splash_binding.dart';
@@ -17,19 +19,24 @@ class AppPages {
       binding: SplashBinding(),
     ),
     GetPage(
-      name: AppRoutes.home,
+      name: AppRoutes.homePage,
       page: () => const HomePage(),
       binding: HomeBinding(),
     ),
     GetPage(
-      name: AppRoutes.settings,
+      name: AppRoutes.settingsPage,
       page: () => const SettingsPage(),
       binding: SettingsBinding(),
     ),
     GetPage(
-      name: AppRoutes.language,
+      name: AppRoutes.languagePage,
       page: () => const LanguagePage(),
       binding: LanguageBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.mainPage,
+      page: () => const MainPage(),
+      binding: MainBinding(),
     ),
   ];
 }
