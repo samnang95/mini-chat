@@ -14,9 +14,10 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       title: 'Mini Chat',
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.home,
       initialBinding: InitialBinding(),
       getPages: AppPages.pages,
+      // initialRoute: AppRoutes.initial,
+      initialRoute: AppRoutes.settings,
 
       // ── EasyLocalization integration ──────────────────
       locale: context.locale,
