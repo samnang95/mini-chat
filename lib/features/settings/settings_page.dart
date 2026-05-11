@@ -73,7 +73,7 @@ class SettingsPage extends GetView<SettingsController> {
               title: StringTranslateExtension(LocaleKeys.translation).tr(),
               isSwitch: false,
               onTap: () {
-                Get.toNamed(AppRoutes.language);
+                Get.toNamed(AppRoutes.languagePage);
               },
               suffixIcon: FontAwesomeIcons.arrowRightLong,
             ),
