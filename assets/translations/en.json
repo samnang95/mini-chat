@@ -1,8 +1,29 @@
 {
   "app_name": "Mini Chat",
+  "auth": {
+    "logout": "Logout"
+  },
   "splash": {
     "tagline": "Effortless. clear. Warm.",
-    "installing": "INSTALLING",
+    "installing": "INS  TALLING",
     "product_of": "A Product of"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": "Preferences",
+    "support": "Support",
+    "account": "Account",
+    "privacy_and_security": "Privacy & Security",
+    "chat_settings": "Chat Settings",
+    "appearance": "Appearance",
+    "help_center": "Help Center",
+    "translation": "Translation"
+  },
+  "language": {
+    "select_language": "Select Language",
+    "confirm": "Confirm",
+    "english": "English",
+    "khmer": "Khmer",
+    "chinese": "Chinese"
   }
 }

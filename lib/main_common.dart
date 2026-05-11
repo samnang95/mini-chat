@@ -21,7 +21,7 @@ Future<void> mainCommon(FlavorConfig config) async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('km')],
+      supportedLocales: const [Locale('en'), Locale('km'), Locale('zh')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: const App(),

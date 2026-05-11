@@ -17,7 +17,7 @@ class XScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor ?? AppColors.primaryLightest,
+      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       appBar: appBar,
       body: body,
       floatingActionButton: floatingActionButton,

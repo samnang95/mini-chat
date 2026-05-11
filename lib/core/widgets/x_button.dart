@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_dimens.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 
@@ -36,40 +35,39 @@ class XButton extends StatelessWidget {
     Color foregroundColor;
     BorderSide borderSide;
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     switch (type) {
       case XButtonType.primary:
-        backgroundColor = AppColors.primary;
-        foregroundColor = AppColors.white;
+        backgroundColor = colorScheme.primary;
+        foregroundColor = colorScheme.onPrimary;
         borderSide = BorderSide.none;
         break;
       case XButtonType.secondary:
-        backgroundColor = isDark ? AppColors.darkCard : AppColors.card;
-        foregroundColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+        backgroundColor = Theme.of(context).cardColor;
+        foregroundColor = colorScheme.onSurface;
         borderSide = BorderSide.none;
         break;
       case XButtonType.outline:
         backgroundColor = Colors.transparent;
-        foregroundColor = AppColors.primary;
-        borderSide = const BorderSide(color: AppColors.primary, width: 1.5);
+        foregroundColor = colorScheme.primary;
+        borderSide = BorderSide(color: colorScheme.primary, width: 1.5);
         break;
       case XButtonType.text:
         backgroundColor = Colors.transparent;
-        foregroundColor = AppColors.primary;
+        foregroundColor = colorScheme.primary;
         borderSide = BorderSide.none;
         break;
     }
 
     // Handle disabled state
     if (onPressed == null && !isLoading) {
-      backgroundColor = AppColors.disabled;
-      foregroundColor = AppColors.white;
+      backgroundColor = Theme.of(context).disabledColor.withValues(alpha: 0.12);
+      foregroundColor = Theme.of(context).disabledColor;
       if (type == XButtonType.outline || type == XButtonType.text) {
         backgroundColor = Colors.transparent;
-        foregroundColor = AppColors.disabled;
         borderSide = type == XButtonType.outline
-            ? const BorderSide(color: AppColors.disabled, width: 1.5)
+            ? BorderSide(color: Theme.of(context).disabledColor, width: 1.5)
             : BorderSide.none;
       }
     }
