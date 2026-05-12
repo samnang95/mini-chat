@@ -17,14 +17,14 @@ class App extends StatelessWidget {
       initialBinding: InitialBinding(),
       getPages: AppPages.pages,
       // initialRoute: AppRoutes.initial,
-      initialRoute: AppRoutes.mainPage,
+      initialRoute: AppRoutes.callPage,
 
       // ── EasyLocalization integration ──────────────────
       locale: context.locale,
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
 
-      // ── Theme ─────────────────────────────────────────
+      // ── Theme ─────────────────────────R────────────────
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,

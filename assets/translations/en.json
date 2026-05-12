@@ -25,5 +25,8 @@
     "english": "English",
     "khmer": "Khmer",
     "chinese": "Chinese"
+  },
+  "call": {
+    "title": "Call"
   }
 }

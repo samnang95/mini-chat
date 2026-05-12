@@ -25,5 +25,8 @@
     "english": "英文",
     "khmer": "高棉文",
     "chinese": "中文"
+  },
+  "call": {
+    "title": "呼叫"
   }
 }

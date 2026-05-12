@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:mini_chat/core/localization/locale_keys.dart';
+import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/widgets/x_button.dart';
 
 class ButtonConfirm extends StatelessWidget {

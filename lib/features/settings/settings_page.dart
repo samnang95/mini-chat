@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mini_chat/core/localization/locale_keys.dart';
+import 'package:mini_chat/core/constants/locale_keys.dart';
+import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/widgets/x_button_switch.dart';
 import 'package:mini_chat/core/widgets/x_profile.dart';
 import 'package:mini_chat/core/widgets/x_scaffold.dart';
@@ -99,6 +99,7 @@ class SettingsPage extends GetView<SettingsController> {
               onChanged: (val) {},
             ),
             Logout(),
+            Text("Hello",style: AppTypography.bodyLarge,)
           ],
         ),
       ),

@@ -2,7 +2,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:get/get.dart';
-// import 'package:mini_chat/core/localization/locale_keys.dart';
+// import 'package:mini_chat/core/constants/locale_keys.dart';
 // import 'package:mini_chat/core/widgets/x_button_switch.dart';
 
 // class SwichDarkMode extends StatefulWidget {

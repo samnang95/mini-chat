@@ -5,6 +5,9 @@ abstract class LocaleKeys {
   // Auth
   static const logout = 'auth.logout';
 
+  // Call
+  static const call = 'call.title';
+
   // Settings
   static const settings = 'settings.title';
   static const preferences = 'settings.preferences';

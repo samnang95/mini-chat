@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:mini_chat/core/localization/locale_keys.dart';
+import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 
 class Logout extends StatelessWidget {

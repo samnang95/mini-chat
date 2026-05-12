@@ -4,4 +4,7 @@ abstract class AppRoutes {
   static const settingsPage = '/settingsPage';
   static const languagePage = '/languagePage';
   static const mainPage = '/mainPage';
-} 
+  static const chatPage = '/chatPage';
+  static const contactPage = '/contactPage';
+  static const callPage = '/callPage';
+}

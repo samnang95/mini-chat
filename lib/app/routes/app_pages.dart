@@ -1,5 +1,11 @@
 import 'package:get/get.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
+import 'package:mini_chat/features/call/call_binding.dart';
+import 'package:mini_chat/features/call/call_page.dart';
+import 'package:mini_chat/features/chat/chat_binding.dart';
+import 'package:mini_chat/features/chat/chat_page.dart';
+import 'package:mini_chat/features/contact/contact_binding.dart';
+import 'package:mini_chat/features/contact/contact_page.dart';
 import 'package:mini_chat/features/home/home_binding.dart';
 import 'package:mini_chat/features/home/home_page.dart';
 import 'package:mini_chat/features/language/language_binding.dart';
@@ -37,6 +43,21 @@ class AppPages {
       name: AppRoutes.mainPage,
       page: () => const MainPage(),
       binding: MainBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.chatPage,
+      page: () => const ChatPage(),
+      binding: ChatBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.contactPage,
+      page: () => const ContactPage(),
+      binding: ContactBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.callPage,
+      page: () => const CallPage(),
+      binding: CallBinding(),
     ),
   ];
 }
