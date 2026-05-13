@@ -4,7 +4,7 @@ import 'package:mini_chat/core/constants/app_images.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:mini_chat/core/localization/locale_keys.dart';
+import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/widgets/x_gradient_text.dart';
 import 'package:mini_chat/features/splash/splash_controller.dart';
 

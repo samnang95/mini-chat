@@ -25,5 +25,14 @@
     "english": "English",
     "khmer": "Khmer",
     "chinese": "Chinese"
+  },
+  "call": {
+    "title": "Call"
+  },
+    "main": {
+    "chat": "Chat",
+    "contacts": "Contacts",
+    "call": "Call",
+    "settings": "Settings"
   }
 }

@@ -25,5 +25,14 @@
     "english": "英文",
     "khmer": "高棉文",
     "chinese": "中文"
+  },
+  "call": {
+    "title": "呼叫"
+  },
+    "main": {
+    "chat": "聊天",
+    "contacts": "联系人",
+    "call": "呼叫",
+    "settings": "设置"
   }
 }

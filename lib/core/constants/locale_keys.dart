@@ -5,6 +5,15 @@ abstract class LocaleKeys {
   // Auth
   static const logout = 'auth.logout';
 
+  // Call
+  static const call = 'call.title';
+
+  // main 
+  static const mainChat = 'main.chat';
+  static const mainContacts = 'main.contacts';
+  static const mainCall = 'main.call';
+  static const mainSettings = 'main.settings';
+
   // Settings
   static const settings = 'settings.title';
   static const preferences = 'settings.preferences';
