@@ -5,7 +5,10 @@ import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mini_chat/core/constants/locale_keys.dart';
+import 'package:mini_chat/core/theme/app_colors.dart';
+import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/widgets/x_button_switch.dart';
+import 'package:mini_chat/core/widgets/x_gradient_text.dart';
 import 'package:mini_chat/core/widgets/x_profile.dart';
 import 'package:mini_chat/core/widgets/x_scaffold.dart';
 import 'package:mini_chat/features/auth/widgets/logout.dart';
@@ -27,7 +30,11 @@ class SettingsPage extends GetView<SettingsController> {
             fit: BoxFit.cover,
           ),
         ),
-        title: StringTranslateExtension(LocaleKeys.settings).tr(),
+        titleWidget: XGradientText(
+          StringTranslateExtension(LocaleKeys.settings).tr(),
+          colors: const [Color.fromARGB(255, 8, 8, 11), AppColors.accent],
+          style: AppTypography.heading1,
+        ),
         action: Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
       ),
       body: Padding(

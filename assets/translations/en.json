@@ -34,5 +34,13 @@
     "contacts": "Contacts",
     "call": "Call",
     "settings": "Settings"
+  },
+    "contact": {
+    "contact": "Contacts",
+    "invite_friend": "Invite Friend",
+    "invite_friend_desc": "Connect with Friend, Bring your besties over and start chatting instantly."
+  },
+  "chat": {
+    "search_conversations": "Search conversations..."
   }
 }
