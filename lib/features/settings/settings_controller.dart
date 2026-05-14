@@ -7,7 +7,6 @@ class SettingsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialize based on current theme mode
     isDarkMode.value = Get.isDarkMode;
   }
 
