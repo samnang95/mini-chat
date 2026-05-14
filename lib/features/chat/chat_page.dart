@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
 import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
@@ -22,7 +23,7 @@ class ChatPage extends GetView<ChatController> {
           child: Image.asset(
             AppImages.image,
             width: 40,
-            height: 40,
+            height: 35,
             fit: BoxFit.cover,
           ),
         ),
@@ -107,8 +108,7 @@ class ChatPage extends GetView<ChatController> {
                           ),
                         ),
                         onTap: () {
-                          // Handle chat navigation here
-                          print("Hello");
+                          Get.toNamed(AppRoutes.chatDetailPage);
                         },
                       ),
                     );

@@ -9,13 +9,18 @@ class ContactPage extends GetView<ContactController> {
 
   @override
   Widget build(BuildContext context) {
-    return XScaffold(appBar: XAppBar(title: "Hello", leading: ClipOval(
+    return XScaffold(
+      appBar: XAppBar(
+        titleWidget: Text("Contact"),
+        leading: ClipOval(
           child: Image.asset(
             AppImages.image,
             width: 40,
             height: 35,
             fit: BoxFit.cover,
           ),
-        ),));
+        ),
+      ),
+    );
   }
 }
