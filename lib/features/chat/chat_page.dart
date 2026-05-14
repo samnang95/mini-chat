@@ -40,7 +40,7 @@ class ChatPage extends GetView<ChatController> {
             child: XTextField(
               prefixIcon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
               suffixIcon: const FaIcon(Icons.mic),
-              hintText: "Search conversations...",
+              hintText: StringTranslateExtension(LocaleKeys.searchConversations).tr(),
               keyboardType: TextInputType.text,
               onChanged: controller.onSearchChanged,
             ),

@@ -36,4 +36,12 @@ abstract class LocaleKeys {
   static const splashTagline = 'splash.tagline';
   static const splashInstalling = 'splash.installing';
   static const splashProductOf = 'splash.product_of';
+
+  // Contact
+  static const contact = 'contact.contact';
+  static const inviteFriend = 'contact.invite_friend';
+  static const inviteFriendDesc = 'contact.invite_friend_desc';
+
+  // Chat
+  static const searchConversations = 'chat.search_conversations';
 }

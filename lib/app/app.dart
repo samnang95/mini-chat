@@ -17,7 +17,7 @@ class App extends StatelessWidget {
       initialBinding: InitialBinding(),
       getPages: AppPages.pages,
       // initialRoute: AppRoutes.initial,
-      initialRoute: AppRoutes.contactPage,
+      initialRoute: AppRoutes.mainPage,
 
       // ── EasyLocalization integration ──────────────────
       locale: context.locale,
