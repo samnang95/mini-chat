@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/features/call/call_binding.dart';
 import 'package:mini_chat/features/call/call_page.dart';
+import 'package:mini_chat/features/chat-detail/chat_detail_binding.dart';
+import 'package:mini_chat/features/chat-detail/chat_detail_page.dart';
 import 'package:mini_chat/features/chat/chat_binding.dart';
 import 'package:mini_chat/features/chat/chat_page.dart';
 import 'package:mini_chat/features/contact/contact_binding.dart';
@@ -58,6 +60,11 @@ class AppPages {
       name: AppRoutes.callPage,
       page: () => const CallPage(),
       binding: CallBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.chatDetailPage,
+      page: () => const ChatDetailPage(),
+      binding: ChatDetailBinding(),
     ),
   ];
 }

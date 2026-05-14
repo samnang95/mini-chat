@@ -7,4 +7,5 @@ abstract class AppRoutes {
   static const chatPage = '/chatPage';
   static const contactPage = '/contactPage';
   static const callPage = '/callPage';
+  static const chatDetailPage = '/chatDetailPage';
 }
