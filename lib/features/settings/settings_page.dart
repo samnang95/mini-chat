@@ -28,7 +28,7 @@ class SettingsPage extends GetView<SettingsController> {
           ),
         ),
         title: StringTranslateExtension(LocaleKeys.settings).tr(),
-        action: Icon(FontAwesomeIcons.magnifyingGlass),
+        action: Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 16, right: 16),

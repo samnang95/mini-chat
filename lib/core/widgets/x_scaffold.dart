@@ -17,7 +17,8 @@ class XScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       appBar: appBar,
       body: body,
       floatingActionButton: floatingActionButton,
@@ -28,13 +29,15 @@ class XScaffold extends StatelessWidget {
 class XAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final Widget? action;
-  final String title;
+  final String? title;
+  final Widget? titleWidget;
   final double height;
 
   const XAppBar({
     super.key,
     this.leading,
-    required this.title,
+    this.title,
+    this.titleWidget,
     this.action,
     this.height = kToolbarHeight,
   });
@@ -49,7 +52,11 @@ class XAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       centerTitle: false,
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      title:
+          titleWidget ??
+          (title != null
+              ? Text(title!, style: const TextStyle(color: Colors.black))
+              : const SizedBox.shrink()),
       actions: action != null
           ? [
               Padding(
@@ -61,13 +68,7 @@ class XAppBar extends StatelessWidget implements PreferredSizeWidget {
       iconTheme: const IconThemeData(color: Colors.white),
       toolbarHeight: height,
       flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.secondary],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        decoration: const BoxDecoration(color: AppColors.primaryLighter),
       ),
     );
   }
