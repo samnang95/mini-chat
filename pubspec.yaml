@@ -16,6 +16,7 @@ dependencies:
   dio: ^5.7.0
   flutter_dotenv: ^5.2.1
   font_awesome_flutter: ^10.7.0
+  lottie: ^3.3.3
 
 dev_dependencies:
   flutter_test:
@@ -29,6 +30,7 @@ flutter:
     - assets/translations/
     - assets/icons/
     - assets/images/
+    - assets/lottie/
     - .env.dev
     - .env.staging
     - .env.prod

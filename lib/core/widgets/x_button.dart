@@ -18,6 +18,8 @@ class XButton extends StatelessWidget {
   final bool isLoading;
   final bool isFullWidth;
   final String? svgIconPath;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const XButton({
     super.key,
@@ -27,6 +29,8 @@ class XButton extends StatelessWidget {
     this.isLoading = false,
     this.isFullWidth = true,
     this.svgIconPath,
+    this.backgroundColor,
+    this.textColor,
   });
 
   @override
@@ -58,6 +62,13 @@ class XButton extends StatelessWidget {
         foregroundColor = colorScheme.primary;
         borderSide = BorderSide.none;
         break;
+    }
+
+    if (this.backgroundColor != null) {
+      backgroundColor = this.backgroundColor!;
+    }
+    if (this.textColor != null) {
+      foregroundColor = this.textColor!;
     }
 
     // Handle disabled state

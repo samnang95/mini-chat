@@ -6,7 +6,8 @@
   "splash": {
     "tagline": "Effortless. clear. Warm.",
     "installing": "INS  TALLING",
-    "product_of": "A Product of"
+    "product_of": "A Product of",
+    "studio_clarity": "Studio Clarity"
   },
   "settings": {
     "title": "Settings",
@@ -42,5 +43,11 @@
   },
   "chat": {
     "search_conversations": "Search conversations..."
+  },
+  "start_page": {
+    "title": "Connect Instantly",
+    "subtitle": "Experience a new way of effortless communication with friends and community.",
+    "sign_in": "Sign In",
+    "get_started": "Get Started"
   }
 }

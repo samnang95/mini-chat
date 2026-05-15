@@ -6,7 +6,8 @@
   "splash": {
     "tagline": "轻松。清晰。温暖。",
     "installing": "安装中...",
-    "product_of": "产品来自"
+    "product_of": "产品来自",
+    "studio_clarity": "清晰工作室"
   },
   "settings": {
     "title": "设置",
@@ -42,5 +43,11 @@
   },
   "chat": {
     "search_conversations": "搜索对话..."
+  },
+  "start_page": {
+    "title": "立即连接",
+    "subtitle": "体验与朋友和社区轻松沟通的新方式。",
+    "sign_in": "登录",
+    "get_started": "开始"
   }
 }

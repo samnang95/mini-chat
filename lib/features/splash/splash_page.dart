@@ -29,7 +29,10 @@ class SplashPage extends GetView<SplashController> {
                   colors: [AppColors.primary, AppColors.accent],
                   style: AppTypography.heading1,
                 ),
-                Text(LocaleKeys.splashTagline.tr(), style: AppTypography.bodyLarge),
+                Text(
+                  LocaleKeys.splashTagline.tr(),
+                  style: AppTypography.bodyLarge,
+                ),
               ],
             ),
             Column(
@@ -40,6 +43,21 @@ class SplashPage extends GetView<SplashController> {
                   decoration: BoxDecoration(
                     color: AppColors.primaryLightest,
                     borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: AnimatedBuilder(
+                    animation: controller.animation,
+                    builder: (context, child) {
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 250 * controller.animation.value,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 SizedBox(height: 8),
@@ -53,10 +71,13 @@ class SplashPage extends GetView<SplashController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(LocaleKeys.splashProductOf.tr(), style: AppTypography.bodyLarge),
+                    Text(
+                      LocaleKeys.splashProductOf.tr(),
+                      style: AppTypography.bodyLarge,
+                    ),
                     SizedBox(width: 4),
                     Text(
-                      "Studio Clarity",
+                      LocaleKeys.splashStudioClarity.tr(),
                       style: TextStyle(color: AppColors.primaryDark),
                     ),
                   ],
