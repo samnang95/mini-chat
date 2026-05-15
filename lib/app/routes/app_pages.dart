@@ -19,6 +19,7 @@ import 'package:mini_chat/features/main/main_binding.dart';
 import 'package:mini_chat/features/main/main_page.dart';
 import 'package:mini_chat/features/profile-detail/profile_detail_binding.dart';
 import 'package:mini_chat/features/profile-detail/profile_detail_page.dart';
+import 'package:mini_chat/features/profile-detail/profile_detail_friend_page.dart';
 import 'package:mini_chat/features/settings/settings_binding.dart';
 import 'package:mini_chat/features/settings/settings_page.dart';
 import 'package:mini_chat/features/splash/splash_binding.dart';
@@ -91,6 +92,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.profileDetailPage,
       page: () => const ProfileDetailPage(),
+      binding: ProfileDetailBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.profileDetailFriendPage,
+      page: () => const ProfileDetailFriendPage(),
       binding: ProfileDetailBinding(),
     ),
   ];

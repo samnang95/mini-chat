@@ -22,12 +22,15 @@ class SettingsPage extends GetView<SettingsController> {
   Widget build(BuildContext context) {
     return XScaffold(
       appBar: XAppBar(
-        leading: ClipOval(
-          child: Image.asset(
-            AppImages.image,
-            width: 40,
-            height: 35,
-            fit: BoxFit.cover,
+        leading: GestureDetector(
+          onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
+          child: ClipOval(
+            child: Image.asset(
+              AppImages.image,
+              width: 40,
+              height: 35,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         titleWidget: XGradientText(
@@ -43,7 +46,10 @@ class SettingsPage extends GetView<SettingsController> {
           child: Column(
             children: [
               SizedBox(height: 24),
-              XProfile(),
+              GestureDetector(
+                onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
+                child: XProfile(),
+              ),
               SizedBox(height: 8),
               Subtitle(
                 title: StringTranslateExtension(LocaleKeys.preferences).tr(),
@@ -56,6 +62,7 @@ class SettingsPage extends GetView<SettingsController> {
                 title: StringTranslateExtension(LocaleKeys.account).tr(),
                 value: false,
                 onChanged: (val) {},
+                onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
               ),
               XButtonSwitch(
                 isSwitch: false,

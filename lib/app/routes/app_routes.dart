@@ -9,6 +9,7 @@ abstract class AppRoutes {
   static const callPage = '/callPage';
   static const chatDetailPage = '/chatDetailPage';
   static const profileDetailPage = '/profileDetailPage';
+  static const profileDetailFriendPage = '/profileDetailFriendPage';
   static const loginPage = '/loginPage';
   static const registerPage = '/registerPage';
   static const startPage = '/startPage';

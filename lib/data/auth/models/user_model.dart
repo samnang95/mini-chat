@@ -1,30 +1,71 @@
-import 'package:mini_chat/domain/auth/entities/user_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel extends UserEntity {
-  final String? token;
+class UserModel {
+  final String uid;
+  final String name;
+  final String email;
+  final String username;
+  final String bio;
+  final String phone;
+  final String avatarUrl;
+  final DateTime createdAt;
 
   const UserModel({
-    required super.id,
-    required super.name,
-    required super.email,
-    this.token,
+    required this.uid,
+    required this.name,
+    required this.email,
+    this.username = '',
+    this.bio = '',
+    this.phone = '',
+    this.avatarUrl = '',
+    required this.createdAt,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+  // ── From Firestore ─────────────────────────────────────
+  factory UserModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return UserModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      token: json['token'] as String?,
+      uid: doc.id,
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      username: data['username'] ?? '',
+      bio: data['bio'] ?? '',
+      phone: data['phone'] ?? '',
+      avatarUrl: data['avatarUrl'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  // ── To Firestore ───────────────────────────────────────
+  Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
       'name': name,
       'email': email,
-      'token': token,
+      'username': username,
+      'bio': bio,
+      'phone': phone,
+      'avatarUrl': avatarUrl,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
+  }
+
+  // ── CopyWith ───────────────────────────────────────────
+  UserModel copyWith({
+    String? name,
+    String? username,
+    String? bio,
+    String? phone,
+    String? avatarUrl,
+  }) {
+    return UserModel(
+      uid: uid,
+      email: email,
+      name: name ?? this.name,
+      username: username ?? this.username,
+      bio: bio ?? this.bio,
+      phone: phone ?? this.phone,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      createdAt: createdAt,
+    );
   }
 }

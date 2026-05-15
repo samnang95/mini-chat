@@ -10,6 +10,7 @@ import 'package:mini_chat/features/contact/contact_controller.dart';
 import 'package:mini_chat/features/contact/widgets/invite_friend.dart';
 import 'package:mini_chat/features/contact/widgets/alphabetical_contact_list.dart';
 import 'package:get/get.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 
 class ContactPage extends GetView<ContactController> {
   const ContactPage({super.key});
@@ -23,12 +24,15 @@ class ContactPage extends GetView<ContactController> {
           colors: const [Color.fromARGB(255, 8, 8, 11), AppColors.accent],
           style: AppTypography.heading1,
         ),
-        leading: ClipOval(
-          child: Image.asset(
-            AppImages.image,
-            width: 40,
-            height: 35,
-            fit: BoxFit.cover,
+        leading: GestureDetector(
+          onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
+          child: ClipOval(
+            child: Image.asset(
+              AppImages.image,
+              width: 40,
+              height: 35,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),

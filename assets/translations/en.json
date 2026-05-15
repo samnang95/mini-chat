@@ -1,7 +1,25 @@
 {
   "app_name": "Mini Chat",
   "auth": {
-    "logout": "Logout"
+    "logout": "Logout",
+    "login_title": "Welcome Back",
+    "login_subtitle": "Sign in to continue your conversations",
+    "register_title": "Create Account",
+    "register_subtitle": "Join Mini Chat and start connecting",
+    "email": "Email",
+    "email_hint": "Enter your email",
+    "password": "Password",
+    "password_hint": "Enter your password",
+    "full_name": "Full Name",
+    "full_name_hint": "Enter your full name",
+    "confirm_password": "Confirm Password",
+    "confirm_password_hint": "Re-enter your password",
+    "forgot_password": "Forgot Password?",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "or_continue_with": "or continue with",
+    "dont_have_account": "Don't have an account?",
+    "already_have_account": "Already have an account?"
   },
   "splash": {
     "tagline": "Effortless. clear. Warm.",
@@ -49,5 +67,21 @@
     "subtitle": "Experience a new way of effortless communication with friends and community.",
     "sign_in": "Sign In",
     "get_started": "Get Started"
+  },
+  "profile": {
+    "message": "Message",
+    "audio_call": "Audio",
+    "video_call": "Video",
+    "bio": "Bio",
+    "phone": "Phone",
+    "email": "Email",
+    "shared_media": "Shared Media",
+    "mute_notifications": "Mute Notifications",
+    "muted": "Muted",
+    "block_user": "Block User",
+    "edit_profile": "Edit Profile",
+    "change_avatar": "Change Avatar",
+    "change_password": "Change Password",
+    "logout": "Logout"
   }
 }

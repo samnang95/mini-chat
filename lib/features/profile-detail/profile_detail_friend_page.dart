@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:mini_chat/features/auth/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
@@ -10,8 +9,8 @@ import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/features/profile-detail/profile_detail_controller.dart';
 import 'package:mini_chat/features/profile-detail/widgets/profile_widgets.dart';
 
-class ProfileDetailPage extends GetView<ProfileDetailController> {
-  const ProfileDetailPage({super.key});
+class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
+  const ProfileDetailFriendPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +26,11 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
               ProfileHeader(
                 isDark: isDark,
                 avatarWidget: _buildAvatar(isDark),
-                nameWidget: _buildEditableName(),
+                nameWidget: _buildName(),
                 usernameWidget: _buildUsername(),
               ),
 
-              // ── Action Bar (Edit + Change Avatar) ──────────
+              // ── Action Bar (Message, Audio, Video) ─────────
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimens.spacing24,
@@ -52,12 +51,12 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ProfileActionButton(
-                          icon: Icons.edit_outlined,
+                          icon: Icons.chat_bubble_outline_rounded,
                           label: StringTranslateExtension(
-                            LocaleKeys.profileEditProfile,
+                            LocaleKeys.profileMessage,
                           ).tr(),
                           color: AppColors.primary,
-                          onTap: controller.editName,
+                          onTap: controller.onMessageTap,
                         ),
                         Container(
                           width: 1,
@@ -67,12 +66,27 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                               : AppColors.divider,
                         ),
                         ProfileActionButton(
-                          icon: Icons.camera_alt_outlined,
+                          icon: Icons.call_outlined,
                           label: StringTranslateExtension(
-                            LocaleKeys.profileChangeAvatar,
+                            LocaleKeys.profileAudioCall,
+                          ).tr(),
+                          color: AppColors.success,
+                          onTap: controller.onAudioCallTap,
+                        ),
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: isDark
+                              ? AppColors.darkDivider
+                              : AppColors.divider,
+                        ),
+                        ProfileActionButton(
+                          icon: Icons.videocam_outlined,
+                          label: StringTranslateExtension(
+                            LocaleKeys.profileVideoCall,
                           ).tr(),
                           color: AppColors.info,
-                          onTap: controller.changeAvatar,
+                          onTap: controller.onVideoCallTap,
                         ),
                       ],
                     ),
@@ -80,7 +94,7 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                 ),
               ),
 
-              // ── Info Section ──────────────────────────────
+              // ── Info Section (Read-only) ───────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimens.spacing24,
@@ -95,8 +109,6 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       ).tr(),
                       value: controller.bio.value,
                       isDark: isDark,
-                      showEdit: true,
-                      onEdit: controller.editBio,
                     ),
                     ProfileInfoTile(
                       icon: Icons.phone_outlined,
@@ -105,8 +117,6 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       ).tr(),
                       value: controller.phone.value,
                       isDark: isDark,
-                      showEdit: true,
-                      onEdit: controller.editPhone,
                     ),
                     ProfileInfoTile(
                       icon: Icons.email_outlined,
@@ -116,8 +126,8 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       value: controller.email.value,
                       isDark: isDark,
                     ),
-
                     SizedBox(height: Get.height * 0.02),
+
                     // ── Shared Media ─────────────────────────
                     Text(
                       StringTranslateExtension(
@@ -130,28 +140,34 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                     const SizedBox(height: AppDimens.spacing12),
                     ProfileSharedMediaGrid(isDark: isDark),
 
-                    SizedBox(height: Get.height * 0.02),
+                    SizedBox(height: Get.height * 0.03),
 
-                    // ── Settings ─────────────────────────────
-                    ProfileSettingTile(
-                      icon: Icons.lock_outline_rounded,
-                      label: StringTranslateExtension(
-                        LocaleKeys.profileChangePassword,
-                      ).tr(),
-                      isDark: isDark,
-                      onTap: () {
-                        // TODO: Change password
-                      },
+                    // ── Mute & Block ─────────────────────────
+                    Obx(
+                      () => ProfileSettingTile(
+                        icon: controller.isMuted.value
+                            ? Icons.notifications_off_outlined
+                            : Icons.notifications_outlined,
+                        label: controller.isMuted.value
+                            ? StringTranslateExtension(
+                                LocaleKeys.profileMuted,
+                              ).tr()
+                            : StringTranslateExtension(
+                                LocaleKeys.profileMuteNotifications,
+                              ).tr(),
+                        isDark: isDark,
+                        onTap: controller.toggleMute,
+                      ),
                     ),
                     ProfileSettingTile(
-                      icon: Icons.logout_rounded,
+                      icon: Icons.block_rounded,
                       label: StringTranslateExtension(
-                        LocaleKeys.profileLogout,
+                        LocaleKeys.profileBlockUser,
                       ).tr(),
                       isDark: isDark,
                       isDestructive: true,
                       onTap: () {
-                        Get.find<AuthController>().logout();
+                        // TODO: Block user
                       },
                     ),
 
@@ -166,69 +182,29 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
     );
   }
 
-  // ── Avatar with camera overlay ─────────────────────────
+  // ── Avatar (read-only, no camera overlay) ──────────────
   Widget _buildAvatar(bool isDark) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isDark ? AppColors.darkBackground : AppColors.white,
-          ),
-          child: CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage(AppImages.image),
-          ),
-        ),
-        Positioned(
-          bottom: 2,
-          right: 2,
-          child: GestureDetector(
-            onTap: controller.changeAvatar,
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isDark ? AppColors.darkBackground : AppColors.white,
-                  width: 2,
-                ),
-              ),
-              child: const Icon(
-                Icons.camera_alt_rounded,
-                size: 14,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isDark ? AppColors.darkBackground : AppColors.white,
+      ),
+      child: CircleAvatar(
+        radius: 50,
+        backgroundImage: AssetImage(AppImages.image),
+      ),
     );
   }
 
-  // ── Editable Name ──────────────────────────────────────
-  Widget _buildEditableName() {
-    return GestureDetector(
-      onTap: controller.editName,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Obx(
-            () => Text(
-              controller.name.value,
-              style: AppTypography.heading2.copyWith(color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Icon(
-            Icons.edit_rounded,
-            size: 14,
-            color: Colors.white.withValues(alpha: 0.7),
-          ),
-        ],
+  // ── Name (read-only) ───────────────────────────────────
+  Widget _buildName() {
+    return Obx(
+      () => Text(
+        controller.name.value,
+        style: AppTypography.heading2.copyWith(
+          color: Colors.white,
+        ),
       ),
     );
   }

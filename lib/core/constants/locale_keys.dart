@@ -2,9 +2,6 @@ abstract class LocaleKeys {
   // App
   static const appName = 'app_name';
 
-  // Auth
-  static const logout = 'auth.logout';
-
   // Call
   static const call = 'call.title';
 
@@ -51,4 +48,41 @@ abstract class LocaleKeys {
   static const startPageSubtitle = 'start_page.subtitle';
   static const startPageSignIn = 'start_page.sign_in';
   static const startPageGetStarted = 'start_page.get_started';
+
+  // Auth
+  static const logout = 'auth.logout';
+  static const authLoginTitle = 'auth.login_title';
+  static const authLoginSubtitle = 'auth.login_subtitle';
+  static const authRegisterTitle = 'auth.register_title';
+  static const authRegisterSubtitle = 'auth.register_subtitle';
+  static const authEmail = 'auth.email';
+  static const authEmailHint = 'auth.email_hint';
+  static const authPassword = 'auth.password';
+  static const authPasswordHint = 'auth.password_hint';
+  static const authFullName = 'auth.full_name';
+  static const authFullNameHint = 'auth.full_name_hint';
+  static const authConfirmPassword = 'auth.confirm_password';
+  static const authConfirmPasswordHint = 'auth.confirm_password_hint';
+  static const authForgotPassword = 'auth.forgot_password';
+  static const authSignIn = 'auth.sign_in';
+  static const authSignUp = 'auth.sign_up';
+  static const authOrContinueWith = 'auth.or_continue_with';
+  static const authDontHaveAccount = 'auth.dont_have_account';
+  static const authAlreadyHaveAccount = 'auth.already_have_account';
+
+  // Profile Detail
+  static const profileMessage = 'profile.message';
+  static const profileAudioCall = 'profile.audio_call';
+  static const profileVideoCall = 'profile.video_call';
+  static const profileBio = 'profile.bio';
+  static const profilePhone = 'profile.phone';
+  static const profileEmail = 'profile.email';
+  static const profileSharedMedia = 'profile.shared_media';
+  static const profileMuteNotifications = 'profile.mute_notifications';
+  static const profileMuted = 'profile.muted';
+  static const profileBlockUser = 'profile.block_user';
+  static const profileEditProfile = 'profile.edit_profile';
+  static const profileChangeAvatar = 'profile.change_avatar';
+  static const profileChangePassword = 'profile.change_password';
+  static const profileLogout = 'profile.logout';
 }

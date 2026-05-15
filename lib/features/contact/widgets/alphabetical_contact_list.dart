@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
@@ -94,7 +96,16 @@ class AlphabeticalContactList extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 onTap: () {
-                  // Handle contact tap
+                  Get.toNamed(
+                    AppRoutes.chatDetailPage,
+                    arguments: {
+                      'name': contact['name'] ?? '',
+                      'avatar': contact['avatar'] ?? '',
+                      'status': contact['status'] ?? 'Online',
+                      'otherUserId': contact['uid'] ?? '',
+                      'conversationId': '',
+                    },
+                  );
                 },
               );
             }),

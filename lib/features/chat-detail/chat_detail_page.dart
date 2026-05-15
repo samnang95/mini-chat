@@ -4,9 +4,10 @@ import 'package:get/get.dart';
 import 'package:mini_chat/core/widgets/x_message_chat.dart';
 import 'package:mini_chat/core/widgets/x_chat_date_header.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
+import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/widgets/x_scaffold.dart';
-import 'package:mini_chat/core/widgets/x_text_field_chat.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/features/chat-detail/chat_detail_controller.dart';
 
 class ChatDetailPage extends GetView<ChatDetailController> {
@@ -14,66 +15,110 @@ class ChatDetailPage extends GetView<ChatDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: XAppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppColors.darkTextPrimary : Colors.black,
+          ),
           onPressed: () => Get.back(),
         ),
         titleWidget: Obx(() {
-          return Row(
-            children: [
-              ClipOval(
-                child: controller.chatAvatar.value.isNotEmpty
-                    ? Image.network(
-                        controller.chatAvatar.value,
-                        width: 36,
-                        height: 36,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        AppImages.image,
-                        width: 36,
-                        height: 36,
-                        fit: BoxFit.cover,
+          return GestureDetector(
+            onTap: () => Get.toNamed(AppRoutes.profileDetailFriendPage),
+            child: Row(
+              children: [
+                ClipOval(
+                  child: controller.chatAvatar.value.isNotEmpty
+                      ? Image.network(
+                          controller.chatAvatar.value,
+                          width: 36,
+                          height: 36,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          AppImages.image,
+                          width: 36,
+                          height: 36,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.chatName.value,
+                      style: AppTypography.subtitle1.copyWith(
+                        color: isDark ? AppColors.darkTextPrimary : Colors.black,
                       ),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    controller.chatName.value,
-                    style: AppTypography.subtitle1.copyWith(
-                      color: Colors.black,
                     ),
-                  ),
-                  Text(
-                    controller.chatStatus.value,
-                    style: AppTypography.caption.copyWith(
-                      color: Colors.black45,
+                    Text(
+                      controller.chatStatus.value,
+                      style: AppTypography.caption.copyWith(
+                        color: isDark ? AppColors.darkTextSecondary : Colors.black45,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           );
         }),
         action: Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.video_call_rounded, color: Colors.black45),
+              icon: Icon(
+                Icons.video_call_rounded,
+                color: isDark ? AppColors.darkTextSecondary : Colors.black45,
+              ),
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.phone, color: Colors.black45),
+              icon: Icon(
+                Icons.phone,
+                color: isDark ? AppColors.darkTextSecondary : Colors.black45,
+              ),
               onPressed: () {},
             ),
           ],
         ),
       ),
       body: Obx(() {
+        if (controller.messages.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  size: 64,
+                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No messages yet',
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Send a message to start the conversation!',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
         return ListView.builder(
+          controller: controller.scrollController,
           padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
           itemCount: controller.messages.length + 1,
           itemBuilder: (context, index) {
@@ -81,13 +126,14 @@ class ChatDetailPage extends GetView<ChatDetailController> {
               return const XChatDateHeader(date: "Today");
             }
             final msg = controller.messages[index - 1];
+            final isMe = controller.isMyMessage(msg);
             return XMessageChat(
-              isMe: msg['isMe'] as bool,
-              message: msg['message'] as String? ?? "",
-              time: msg['time'] as String,
-              isRead: msg['isRead'] as bool? ?? false,
-              type: msg['type'] as String? ?? 'text',
-              mediaUrl: msg['mediaUrl'] as String?,
+              isMe: isMe,
+              message: msg.text,
+              time: _formatTime(msg.createdAt),
+              isRead: msg.isRead,
+              type: msg.type,
+              mediaUrl: msg.mediaUrl,
             );
           },
         );
@@ -108,37 +154,71 @@ class ChatDetailPage extends GetView<ChatDetailController> {
           child: Row(
             children: [
               IconButton(
-                icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.grey),
+                icon: FaIcon(
+                  FontAwesomeIcons.plus,
+                  color: isDark ? AppColors.darkTextHint : Colors.grey,
+                ),
                 onPressed: () {},
               ),
               const SizedBox(width: 8),
-              const Expanded(
-                child: XTextFieldChat(
-                  suffixIcon: FaIcon(
-                    FontAwesomeIcons.smile,
-                    color: Colors.grey,
+              Expanded(
+                child: TextField(
+                  controller: controller.messageController,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  ),
+                  cursorColor: AppColors.primary,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => controller.sendMessage(),
+                  maxLines: 4,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                    hintText: 'Message...',
+                    hintStyle: AppTypography.bodyLarge.copyWith(
+                      color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                    ),
+                    filled: true,
+                    fillColor: isDark ? AppColors.darkDivider : AppColors.divider,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 12.0,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1.0,
+                      ),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               IconButton(
                 icon: const FaIcon(
-                  FontAwesomeIcons.paperclip,
-                  color: Colors.grey,
-                ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const FaIcon(
                   FontAwesomeIcons.paperPlane,
-                  color: Colors.grey,
+                  color: AppColors.primary,
                 ),
-                onPressed: () {},
+                onPressed: controller.sendMessage,
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 }
