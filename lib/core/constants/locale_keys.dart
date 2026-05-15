@@ -69,4 +69,20 @@ abstract class LocaleKeys {
   static const authOrContinueWith = 'auth.or_continue_with';
   static const authDontHaveAccount = 'auth.dont_have_account';
   static const authAlreadyHaveAccount = 'auth.already_have_account';
+
+  // Profile Detail
+  static const profileMessage = 'profile.message';
+  static const profileAudioCall = 'profile.audio_call';
+  static const profileVideoCall = 'profile.video_call';
+  static const profileBio = 'profile.bio';
+  static const profilePhone = 'profile.phone';
+  static const profileEmail = 'profile.email';
+  static const profileSharedMedia = 'profile.shared_media';
+  static const profileMuteNotifications = 'profile.mute_notifications';
+  static const profileMuted = 'profile.muted';
+  static const profileBlockUser = 'profile.block_user';
+  static const profileEditProfile = 'profile.edit_profile';
+  static const profileChangeAvatar = 'profile.change_avatar';
+  static const profileChangePassword = 'profile.change_password';
+  static const profileLogout = 'profile.logout';
 }

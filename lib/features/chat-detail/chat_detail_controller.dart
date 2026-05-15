@@ -1,127 +1,102 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mini_chat/core/services/chat_service.dart';
+import 'package:mini_chat/core/services/user_service.dart';
+import 'package:mini_chat/data/chat/models/message_model.dart';
 
 class ChatDetailController extends GetxController {
-  final chatName = "Alice Johnson".obs;
-  final chatStatus = "Online".obs;
-  final chatAvatar = "".obs; // In a real app, pass the URL
+  final ChatService _chatService = Get.find<ChatService>();
+  final UserService _userService = Get.find<UserService>();
+
+  final chatName = ''.obs;
+  final chatStatus = 'Online'.obs;
+  final chatAvatar = ''.obs;
+  final conversationId = ''.obs;
+  final otherUserId = ''.obs;
+
+  final messages = <MessageModel>[].obs;
+  final messageController = TextEditingController();
+  final scrollController = ScrollController();
+
+  StreamSubscription? _messagesSubscription;
+
+  String get _currentUid => _userService.currentUser.value?.uid ?? '';
 
   @override
   void onInit() {
     super.onInit();
-    // If navigation passes user data via arguments, read it here
+    // Read arguments passed from chat list
     if (Get.arguments != null) {
-      final user = Get.arguments as Map<String, dynamic>;
-      chatName.value = user['name'] ?? "Alice Johnson";
-      chatStatus.value = user['status'] ?? "Online";
-      chatAvatar.value = user['avatar'] ?? "";
+      final args = Get.arguments as Map<String, dynamic>;
+      chatName.value = args['name'] ?? '';
+      chatStatus.value = args['status'] ?? 'Online';
+      chatAvatar.value = args['avatar'] ?? '';
+      conversationId.value = args['conversationId'] ?? '';
+      otherUserId.value = args['otherUserId'] ?? '';
+    }
+
+    // Listen to real-time messages
+    if (conversationId.value.isNotEmpty) {
+      _listenToMessages();
     }
   }
 
-  final messages = <Map<String, dynamic>>[
-    {
-      'isMe': false,
-      'message': "Hey there! How's it going?",
-      'time': "10:30 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'message': "I'm doing great, just working on a Flutter app. How about you?",
-      'time': "10:32 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': false,
-      'message': "That sounds awesome! I love Flutter.",
-      'time': "10:33 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'message': "Yeah it's super fast to build with.",
-      'time': "10:34 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': false,
-      'message': "Are you using any state management? I've been trying GetX recently.",
-      'time': "10:36 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'message': "Yes! GetX is exactly what I'm using. It makes routing and controllers so easy.",
-      'time': "10:37 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': false,
-      'message': "Agreed. I used to use Provider but GetX requires so much less boilerplate.",
-      'time': "10:39 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': false,
-      'message': "Have you tried building any complex animations with it yet?",
-      'time': "10:39 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'message': "A little bit, mostly just standard page transitions and hero animations.",
-      'time': "10:41 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': true,
-      'message': "Actually, right now I'm building out a chat UI component for my app. Trying to make it look super premium.",
-      'time': "10:42 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': false,
-      'message': "Nice! Chat UIs can be tricky with the keyboard popping up and list scrolling.",
-      'time': "10:44 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'message': "Tell me about it... Just got the dynamic bubbles and dark mode working though! 🚀",
-      'time': "10:46 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': false,
-      'message': "That's awesome! You'll have to show me a demo when it's done.",
-      'time': "10:50 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'message': "For sure. I'll send you a TestFlight link later today.",
-      'time': "10:52 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': false,
-      'type': 'image',
-      'mediaUrl': 'https://images.unsplash.com/photo-1617042375876-a13e36732a04?auto=format&fit=crop&w=400&q=80',
-      'time': "10:55 AM",
-      'isRead': false,
-    },
-    {
-      'isMe': true,
-      'type': 'voice',
-      'time': "10:56 AM",
-      'isRead': true,
-    },
-    {
-      'isMe': false,
-      'type': 'location',
-      'message': 'Meet me at the coffee shop here!',
-      'time': "11:00 AM",
-      'isRead': false,
-    },
-    
-  ].obs;
+  void _listenToMessages() {
+    _messagesSubscription = _chatService
+        .getMessages(conversationId.value)
+        .listen((messageList) {
+      messages.value = messageList;
+      // Auto-scroll to bottom on new messages
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  // ── Send Message ───────────────────────────────────────
+  Future<void> sendMessage() async {
+    final text = messageController.text.trim();
+    if (text.isEmpty) return;
+
+    messageController.clear();
+
+    // Create conversation if it doesn't exist yet
+    if (conversationId.value.isEmpty && otherUserId.value.isNotEmpty) {
+      conversationId.value = await _chatService.getOrCreateConversation(
+        otherUserId.value,
+      );
+      _listenToMessages();
+    }
+
+    if (conversationId.value.isNotEmpty) {
+      await _chatService.sendMessage(
+        conversationId: conversationId.value,
+        text: text,
+      );
+    }
+  }
+
+  // ── Check if message is from me ────────────────────────
+  bool isMyMessage(MessageModel message) {
+    return message.senderId == _currentUid;
+  }
+
+  @override
+  void onClose() {
+    _messagesSubscription?.cancel();
+    messageController.dispose();
+    scrollController.dispose();
+    super.onClose();
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
@@ -17,14 +16,19 @@ class ChatPage extends GetView<ChatController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: XAppBar(
-        leading: ClipOval(
-          child: Image.asset(
-            AppImages.image,
-            width: 40,
-            height: 35,
-            fit: BoxFit.cover,
+        leading: GestureDetector(
+          onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
+          child: ClipOval(
+            child: Image.asset(
+              AppImages.image,
+              width: 40,
+              height: 35,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         titleWidget: XGradientText(
@@ -35,85 +39,123 @@ class ChatPage extends GetView<ChatController> {
       ),
       body: Column(
         children: [
+          // ── Search Bar ──────────────────────────────────
           Padding(
-            padding: const EdgeInsets.only(right: 16, left: 16, top: 16),
+            padding: const EdgeInsets.all(16),
             child: XTextField(
-              prefixIcon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
-              suffixIcon: const FaIcon(Icons.mic),
               hintText: StringTranslateExtension(LocaleKeys.searchConversations).tr(),
-              keyboardType: TextInputType.text,
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+              ),
               onChanged: controller.onSearchChanged,
             ),
           ),
-          const SizedBox(height: 16),
-          Obx(() {
-            if (controller.isShow.value) {
-              return Container(
-                height: 1,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkDivider
-                      : AppColors.divider,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      offset: const Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          }),
+
+          // ── Chat List ───────────────────────────────────
           Expanded(
             child: Obx(() {
-              final users = controller.filteredUsers;
-              if (users.isEmpty) {
-                return const Center(child: Text("No users found"));
-              }
-              return Scrollbar(
-                controller: controller.scrollController,
-                child: ListView.separated(
-                  controller: controller.scrollController,
-                  itemCount: users.length,
-                  separatorBuilder: (context, index) => Divider(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.darkDivider
-                        : AppColors.divider,
-                    height: 1,
-                    indent: 80,
-                    endIndent: 16,
+              final convs = controller.filteredConversations;
+
+              if (convs.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 64,
+                        color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No conversations yet',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Start chatting from Contacts!',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                        ),
+                      ),
+                    ],
                   ),
-                  itemBuilder: (context, index) {
-                    final user = users[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: CircleAvatar(
+                );
+              }
+
+              return ListView.separated(
+                controller: controller.scrollController,
+                itemCount: convs.length,
+                separatorBuilder: (_, __) => Divider(
+                  color: isDark ? AppColors.darkDivider : AppColors.divider,
+                  height: 1,
+                  indent: 80,
+                  endIndent: 16,
+                ),
+                itemBuilder: (context, index) {
+                  final conv = convs[index];
+                  final otherUser = controller.getOtherUser(conv);
+                  final otherUserId = controller.getOtherUserId(conv);
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: GestureDetector(
+                        onTap: () => Get.toNamed(AppRoutes.profileDetailFriendPage),
+                        child: CircleAvatar(
                           radius: 24,
-                          backgroundImage: NetworkImage(user['avatar']),
-                        ),
-                        title: Text(
-                          user['name'],
-                          style: AppTypography.subtitle1,
-                        ),
-                        subtitle: Text(
-                          user['status'],
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: user['status'] == 'Online'
-                                ? AppColors.success
-                                : AppColors.textHint,
+                          backgroundColor: AppColors.primary.withOpacity(0.2),
+                          child: Text(
+                            (otherUser?.name ?? '?')[0].toUpperCase(),
+                            style: AppTypography.heading2.copyWith(
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
-                        onTap: () {
-                          Get.toNamed(AppRoutes.chatDetailPage);
-                        },
                       ),
-                    );
-                  },
-                ),
+                      title: Text(
+                        otherUser?.name ?? 'Loading...',
+                        style: AppTypography.subtitle1,
+                      ),
+                      subtitle: Text(
+                        conv.lastMessage.isNotEmpty
+                            ? conv.lastMessage
+                            : 'Start a conversation',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Text(
+                        controller.formatTime(conv.lastMessageTime),
+                        style: AppTypography.caption.copyWith(
+                          color: isDark
+                              ? AppColors.darkTextHint
+                              : AppColors.textHint,
+                        ),
+                      ),
+                      onTap: () {
+                        Get.toNamed(
+                          AppRoutes.chatDetailPage,
+                          arguments: {
+                            'conversationId': conv.id,
+                            'name': otherUser?.name ?? '',
+                            'avatar': otherUser?.avatarUrl ?? '',
+                            'status': 'Online',
+                            'otherUserId': otherUserId,
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
               );
             }),
           ),

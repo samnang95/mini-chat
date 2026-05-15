@@ -4,6 +4,9 @@ import 'package:mini_chat/app/config/env_config.dart';
 import 'package:mini_chat/core/network/api_client.dart';
 import 'package:mini_chat/core/network/api_endpoints.dart';
 import 'package:mini_chat/core/network/api_interceptors.dart';
+import 'package:mini_chat/core/services/chat_service.dart';
+import 'package:mini_chat/core/services/user_service.dart';
+import 'package:mini_chat/features/auth/auth_controller.dart';
 import 'package:mini_chat/features/language/language_controller.dart';
 
 class InitialBinding extends Bindings {
@@ -33,6 +36,13 @@ class InitialBinding extends Bindings {
     // ── Register Dio & ApiClient ─────────────────────────
     Get.put<Dio>(dio, permanent: true);
     Get.put<ApiClient>(ApiClient(dio), permanent: true);
+
+    // ── Services ─────────────────────────────────────────
+    Get.put(UserService(), permanent: true);
+    Get.put(ChatService(), permanent: true);
+
+    // ── Auth ─────────────────────────────────────────────
+    Get.put(AuthController(), permanent: true);
 
     // ── Language ─────────────────────────────────────────
     Get.put(LanguageController(), permanent: true);

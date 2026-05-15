@@ -67,5 +67,21 @@
     "subtitle": "Experience a new way of effortless communication with friends and community.",
     "sign_in": "Sign In",
     "get_started": "Get Started"
+  },
+  "profile": {
+    "message": "Message",
+    "audio_call": "Audio",
+    "video_call": "Video",
+    "bio": "Bio",
+    "phone": "Phone",
+    "email": "Email",
+    "shared_media": "Shared Media",
+    "mute_notifications": "Mute Notifications",
+    "muted": "Muted",
+    "block_user": "Block User",
+    "edit_profile": "Edit Profile",
+    "change_avatar": "Change Avatar",
+    "change_password": "Change Password",
+    "logout": "Logout"
   }
 }

@@ -14,19 +14,15 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       title: 'Mini Chat',
       debugShowCheckedModeBanner: false,
-      initialBinding: InitialBinding(),
-      getPages: AppPages.pages,
-      initialRoute: AppRoutes.initial,
-
-      // ── EasyLocalization integration ──────────────────
       locale: context.locale,
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
-
-      // ── Theme ─────────────────────────R────────────────
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
+      initialBinding: InitialBinding(),
+      getPages: AppPages.pages,
+      initialRoute: AppRoutes.initial,
     );
   }
 }

@@ -1,8 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
+import 'package:mini_chat/core/services/user_service.dart';
 
 class AuthController extends GetxController {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final UserService _userService = Get.find<UserService>();
+
   // ── Login Fields ──────────────────────────────────────
   final loginEmailController = TextEditingController();
   final loginPasswordController = TextEditingController();
@@ -76,33 +81,93 @@ class AuthController extends GetxController {
     return null;
   }
 
-  // ── Actions ───────────────────────────────────────────
+  // ── Login with Firebase ───────────────────────────────
   Future<void> login() async {
     if (!loginFormKey.currentState!.validate()) return;
 
     isLoading.value = true;
 
-    // TODO: Replace with real API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: loginEmailController.text.trim(),
+        password: loginPasswordController.text,
+      );
 
-    isLoading.value = false;
+      // Load user profile from Firestore
+      try {
+        await _userService.loadCurrentUser();
+      } catch (_) {}
 
-    // Navigate to main page on success
-    Get.offAllNamed(AppRoutes.mainPage);
+      // Success → Navigate to main page
+      Get.offAllNamed(AppRoutes.mainPage);
+    } on FirebaseAuthException catch (e) {
+      _showError(_getFirebaseErrorMessage(e.code));
+    } catch (e) {
+      _showError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
   }
 
+  // ── Register with Firebase ────────────────────────────
   Future<void> register() async {
     if (!registerFormKey.currentState!.validate()) return;
 
     isLoading.value = true;
 
-    // TODO: Replace with real API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Create account
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: registerEmailController.text.trim(),
+        password: registerPasswordController.text,
+      );
 
-    isLoading.value = false;
+      // Update display name
+      await credential.user?.updateDisplayName(
+        registerNameController.text.trim(),
+      );
 
-    // Navigate to main page on success
-    Get.offAllNamed(AppRoutes.mainPage);
+      // Save user profile to Firestore (non-blocking)
+      try {
+        await _userService.createUserProfile(
+          uid: credential.user!.uid,
+          name: registerNameController.text.trim(),
+          email: registerEmailController.text.trim(),
+        );
+      } catch (_) {}
+
+      // Success → Navigate to main page
+      Get.offAllNamed(AppRoutes.mainPage);
+    } on FirebaseAuthException catch (e) {
+      _showError(_getFirebaseErrorMessage(e.code));
+    } catch (e) {
+      _showError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // ── Forgot Password ──────────────────────────────────
+  Future<void> forgotPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      Get.snackbar(
+        'Email Sent',
+        'Check your inbox for a password reset link',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } on FirebaseAuthException catch (e) {
+      _showError(_getFirebaseErrorMessage(e.code));
+    }
+  }
+
+  // ── Logout ────────────────────────────────────────────
+  Future<void> logout() async {
+    _userService.clearUser();
+    await _auth.signOut();
+    Get.offAllNamed(AppRoutes.loginPage);
   }
 
   // ── Navigation ────────────────────────────────────────
@@ -112,6 +177,41 @@ class AuthController extends GetxController {
 
   void goToLogin() {
     Get.back();
+  }
+
+  // ── Error Helpers ─────────────────────────────────────
+  void _showError(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  String _getFirebaseErrorMessage(String code) {
+    switch (code) {
+      case 'user-not-found':
+        return 'No account found with this email';
+      case 'wrong-password':
+        return 'Incorrect password';
+      case 'invalid-credential':
+        return 'Invalid email or password';
+      case 'email-already-in-use':
+        return 'This email is already registered';
+      case 'weak-password':
+        return 'Password is too weak';
+      case 'invalid-email':
+        return 'Invalid email address';
+      case 'too-many-requests':
+        return 'Too many attempts. Try again later';
+      case 'user-disabled':
+        return 'This account has been disabled';
+      default:
+        return 'Authentication failed. Please try again';
+    }
   }
 
   // ── Dispose ───────────────────────────────────────────

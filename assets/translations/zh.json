@@ -67,5 +67,21 @@
     "subtitle": "体验与朋友和社区轻松沟通的新方式。",
     "sign_in": "登录",
     "get_started": "开始"
+  },
+  "profile": {
+    "message": "消息",
+    "audio_call": "语音",
+    "video_call": "视频",
+    "bio": "简介",
+    "phone": "电话",
+    "email": "邮箱",
+    "shared_media": "共享媒体",
+    "mute_notifications": "静音通知",
+    "muted": "已静音",
+    "block_user": "屏蔽用户",
+    "edit_profile": "编辑资料",
+    "change_avatar": "更换头像",
+    "change_password": "修改密码",
+    "logout": "退出登录"
   }
 }
