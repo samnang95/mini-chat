@@ -36,6 +36,7 @@ abstract class LocaleKeys {
   static const splashTagline = 'splash.tagline';
   static const splashInstalling = 'splash.installing';
   static const splashProductOf = 'splash.product_of';
+  static const splashStudioClarity = 'splash.studio_clarity';
 
   // Contact
   static const contact = 'contact.contact';
@@ -44,4 +45,10 @@ abstract class LocaleKeys {
 
   // Chat
   static const searchConversations = 'chat.search_conversations';
+
+  // Start Page
+  static const startPageTitle = 'start_page.title';
+  static const startPageSubtitle = 'start_page.subtitle';
+  static const startPageSignIn = 'start_page.sign_in';
+  static const startPageGetStarted = 'start_page.get_started';
 }
