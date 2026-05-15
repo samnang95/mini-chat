@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
-import 'package:mini_chat/core/constants/app_images.dart';
+import 'package:lottie/lottie.dart';
+import 'package:mini_chat/core/constants/app_animations.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -22,7 +23,7 @@ class SplashPage extends GetView<SplashController> {
             SizedBox(),
             Column(
               children: [
-                Image.asset(AppImages.image, width: 250, height: 200),
+                Lottie.asset(AppAnimations.boxMessage,repeat: true),
                 SizedBox(height: 4),
                 XGradientText(
                   LocaleKeys.appName.tr(),

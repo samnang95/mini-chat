@@ -1,7 +1,25 @@
 {
   "app_name": "迷你聊天",
   "auth": {
-    "logout": "登出"
+    "logout": "登出",
+    "login_title": "欢迎回来",
+    "login_subtitle": "登录以继续您的对话",
+    "register_title": "创建账户",
+    "register_subtitle": "加入 Mini Chat 开始连接",
+    "email": "邮箱",
+    "email_hint": "输入您的邮箱",
+    "password": "密码",
+    "password_hint": "输入您的密码",
+    "full_name": "全名",
+    "full_name_hint": "输入您的全名",
+    "confirm_password": "确认密码",
+    "confirm_password_hint": "再次输入您的密码",
+    "forgot_password": "忘记密码？",
+    "sign_in": "登录",
+    "sign_up": "注册",
+    "or_continue_with": "或继续使用",
+    "dont_have_account": "没有账户？",
+    "already_have_account": "已有账户？"
   },
   "splash": {
     "tagline": "轻松。清晰。温暖。",

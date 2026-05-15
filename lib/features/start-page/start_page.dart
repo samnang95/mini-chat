@@ -5,6 +5,7 @@ import 'package:mini_chat/core/constants/app_animations.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/widgets/x_button.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/features/start-page/start_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mini_chat/core/constants/locale_keys.dart';
@@ -52,7 +53,7 @@ class StartPage extends GetView<StartController> {
                     label: StringTranslateExtension(
                       LocaleKeys.startPageSignIn,
                     ).tr(),
-                    onPressed: () {},
+                    onPressed: () => Get.toNamed(AppRoutes.loginPage),
                   ),
                   SizedBox(height: Get.height * 0.015),
                   XButton(
@@ -60,7 +61,7 @@ class StartPage extends GetView<StartController> {
                       LocaleKeys.startPageGetStarted,
                     ).tr(),
                     type: XButtonType.secondary,
-                    onPressed: () {},
+                    onPressed: () => Get.toNamed(AppRoutes.registerPage),
                     backgroundColor: AppColors.primaryLighter,
                   ),
                 ],

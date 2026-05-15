@@ -1,7 +1,25 @@
 {
   "app_name": "មីនី ឆាត",
   "auth": {
-    "logout": "ចេញ"
+    "logout": "ចេញ",
+    "login_title": "សូមស្វាគមន៍មកវិញ",
+    "login_subtitle": "ចូលគណនីដើម្បីបន្តការសន្ទនារបស់អ្នក",
+    "register_title": "បង្កើតគណនី",
+    "register_subtitle": "ចូលរួមជាមួយ Mini Chat ហើយចាប់ផ្តើមភ្ជាប់ទំនាក់ទំនង",
+    "email": "អ៊ីមែល",
+    "email_hint": "បញ្ចូលអ៊ីមែលរបស់អ្នក",
+    "password": "ពាក្យសម្ងាត់",
+    "password_hint": "បញ្ចូលពាក្យសម្ងាត់របស់អ្នក",
+    "full_name": "ឈ្មោះពេញ",
+    "full_name_hint": "បញ្ចូលឈ្មោះពេញរបស់អ្នក",
+    "confirm_password": "បញ្ជាក់ពាក្យសម្ងាត់",
+    "confirm_password_hint": "បញ្ចូលពាក្យសម្ងាត់ម្តងទៀត",
+    "forgot_password": "ភ្លេចពាក្យសម្ងាត់?",
+    "sign_in": "ចូលគណនី",
+    "sign_up": "ចុះឈ្មោះ",
+    "or_continue_with": "ឬបន្តជាមួយ",
+    "dont_have_account": "មិនមានគណនីទេ?",
+    "already_have_account": "មានគណនីរួចហើយ?"
   },
   "splash": {
     "tagline": "ងាយស្រួល ច្បាស់លាស់ កក់ក្ដៅ",

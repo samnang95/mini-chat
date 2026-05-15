@@ -16,8 +16,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialBinding: InitialBinding(),
       getPages: AppPages.pages,
-      // initialRoute: AppRoutes.initial,
-      initialRoute: AppRoutes.startPage,
+      initialRoute: AppRoutes.initial,
 
       // ── EasyLocalization integration ──────────────────
       locale: context.locale,

@@ -12,7 +12,7 @@ class SplashController extends GetxController
     super.onInit();
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3), // 3-second splash screen
+      duration: const Duration(seconds: 4),
     );
 
     animation = Tween<double>(begin: 0, end: 1).animate(
