@@ -9,6 +9,7 @@ import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/widgets/x_gradient_text.dart';
 import 'package:mini_chat/core/widgets/x_scaffold.dart';
 import 'package:mini_chat/core/widgets/x_text_field.dart';
+import 'package:mini_chat/core/services/user_service.dart';
 import 'package:mini_chat/features/chat/chat_controller.dart';
 
 class ChatPage extends GetView<ChatController> {
@@ -22,14 +23,24 @@ class ChatPage extends GetView<ChatController> {
       appBar: XAppBar(
         leading: GestureDetector(
           onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
-          child: ClipOval(
-            child: Image.asset(
-              AppImages.image,
-              width: 40,
-              height: 35,
-              fit: BoxFit.cover,
-            ),
-          ),
+          child: Obx(() {
+            final avatarUrl = Get.find<UserService>().currentUser.value?.avatarUrl ?? '';
+            return ClipOval(
+              child: avatarUrl.isNotEmpty
+                  ? Image.network(
+                      avatarUrl,
+                      width: 40,
+                      height: 35,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      AppImages.image,
+                      width: 40,
+                      height: 35,
+                      fit: BoxFit.cover,
+                    ),
+            );
+          }),
         ),
         titleWidget: XGradientText(
           StringTranslateExtension(LocaleKeys.appName).tr(),
@@ -51,6 +62,27 @@ class ChatPage extends GetView<ChatController> {
               onChanged: controller.onSearchChanged,
             ),
           ),
+
+          // ── Scroll Shadow Divider ────────────────────────
+          Obx(() {
+            return Container(
+              height: 1,
+              decoration: BoxDecoration(
+                color: controller.isShow.value
+                    ? (isDark ? AppColors.darkDivider : AppColors.divider)
+                    : Colors.transparent,
+                boxShadow: controller.isShow.value
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          offset: const Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ]
+                    : null,
+              ),
+            );
+          }),
 
           // ── Chat List ───────────────────────────────────
           Expanded(
@@ -86,15 +118,20 @@ class ChatPage extends GetView<ChatController> {
                 );
               }
 
-              return ListView.separated(
-                controller: controller.scrollController,
-                itemCount: convs.length,
-                separatorBuilder: (_, __) => Divider(
-                  color: isDark ? AppColors.darkDivider : AppColors.divider,
-                  height: 1,
-                  indent: 80,
-                  endIndent: 16,
-                ),
+              return RefreshIndicator(
+                onRefresh: controller.refreshConversations,
+                child: ListView.separated(
+                  controller: controller.scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  itemCount: convs.length,
+                  separatorBuilder: (_, __) => Divider(
+                    color: isDark ? AppColors.darkDivider : AppColors.divider,
+                    height: 1,
+                    indent: 80,
+                    endIndent: 16,
+                  ),
                 itemBuilder: (context, index) {
                   final conv = convs[index];
                   final otherUser = controller.getOtherUser(conv);
@@ -109,12 +146,17 @@ class ChatPage extends GetView<ChatController> {
                         child: CircleAvatar(
                           radius: 24,
                           backgroundColor: AppColors.primary.withOpacity(0.2),
-                          child: Text(
-                            (otherUser?.name ?? '?')[0].toUpperCase(),
-                            style: AppTypography.heading2.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
+                          backgroundImage: (otherUser?.avatarUrl ?? '').isNotEmpty
+                              ? NetworkImage(otherUser!.avatarUrl)
+                              : null,
+                          child: (otherUser?.avatarUrl ?? '').isEmpty
+                              ? Text(
+                                  (otherUser?.name ?? '?')[0].toUpperCase(),
+                                  style: AppTypography.heading2.copyWith(
+                                    color: AppColors.primary,
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
                       title: Text(
@@ -156,6 +198,7 @@ class ChatPage extends GetView<ChatController> {
                     ),
                   );
                 },
+              ),
               );
             }),
           ),

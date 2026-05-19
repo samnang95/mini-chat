@@ -73,7 +73,7 @@ class ProfileInfoTile extends StatelessWidget {
       onTap: showEdit ? onEdit : null,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(AppDimens.spacing16),
+        padding: const EdgeInsets.all(AppDimens.spacing12),
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCard : AppColors.background,
           borderRadius: AppDimens.borderRadiusMedium,
@@ -246,7 +246,7 @@ class ProfileHeader extends StatelessWidget {
         // Back button
         Positioned(
           top: MediaQuery.of(context).padding.top + 10,
-          left: AppDimens.spacing16,
+          left: AppDimens.spacing24,
           child: GestureDetector(
             onTap: () => Get.back(),
             child: const Icon(

@@ -5,6 +5,7 @@ import 'package:mini_chat/core/network/api_client.dart';
 import 'package:mini_chat/core/network/api_endpoints.dart';
 import 'package:mini_chat/core/network/api_interceptors.dart';
 import 'package:mini_chat/core/services/chat_service.dart';
+import 'package:mini_chat/core/services/storage_service.dart';
 import 'package:mini_chat/core/services/user_service.dart';
 import 'package:mini_chat/features/auth/auth_controller.dart';
 import 'package:mini_chat/features/language/language_controller.dart';
@@ -40,6 +41,7 @@ class InitialBinding extends Bindings {
     // ── Services ─────────────────────────────────────────
     Get.put(UserService(), permanent: true);
     Get.put(ChatService(), permanent: true);
+    Get.put(StorageService(), permanent: true);
 
     // ── Auth ─────────────────────────────────────────────
     Get.put(AuthController(), permanent: true);

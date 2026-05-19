@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 
@@ -22,41 +24,68 @@ class XMessageChat extends StatelessWidget {
 
   Widget _buildMessageContent(Color textColor, bool isDark) {
     if (type == 'image' && mediaUrl != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: Image.network(
-          mediaUrl!,
-          fit: BoxFit.cover,
-          width: 200,
-          height: 150,
+      return GestureDetector(
+        onTap: () {
+          Get.to(
+            () => Scaffold(
+              backgroundColor: Colors.black,
+              body: Stack(
+                children: [
+                  Positioned.fill(
+                    child: InteractiveViewer(
+                      panEnabled: true,
+                      minScale: 0.5,
+                      maxScale: 4.0,
+                      child: Hero(
+                        tag: mediaUrl!,
+                        child: Image.network(
+                          mediaUrl!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    child: SafeArea(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Get.back(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            fullscreenDialog: true,
+            transition: Transition.fadeIn,
+          );
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Hero(
+            tag: mediaUrl!,
+            child: Image.network(
+              mediaUrl!,
+              fit: BoxFit.cover,
+              width: 200,
+              height: 150,
+            ),
+          ),
         ),
       );
     } else if (type == 'voice') {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.play_circle_fill, color: textColor, size: 32),
-          const SizedBox(width: 8),
-          Container(
-            width: 100,
-            height: 4,
-            decoration: BoxDecoration(
-              color: textColor.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-            alignment: Alignment.centerLeft,
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: textColor,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text("0:12", style: AppTypography.bodyMedium.copyWith(color: textColor)),
-        ],
+      return _VoiceMessagePlayer(
+        mediaUrl: mediaUrl!,
+        textColor: textColor,
+        isMe: isMe,
       );
     } else if (type == 'location') {
       return Column(
@@ -157,6 +186,127 @@ class XMessageChat extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _VoiceMessagePlayer extends StatefulWidget {
+  final String mediaUrl;
+  final Color textColor;
+  final bool isMe;
+
+  const _VoiceMessagePlayer({
+    required this.mediaUrl,
+    required this.textColor,
+    required this.isMe,
+  });
+
+  @override
+  State<_VoiceMessagePlayer> createState() => _VoiceMessagePlayerState();
+}
+
+class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
+  final _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _initAudio();
+  }
+
+  Future<void> _initAudio() async {
+    await _audioPlayer.setSourceUrl(widget.mediaUrl);
+    
+    _audioPlayer.onPlayerStateChanged.listen((state) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = state == PlayerState.playing;
+        });
+      }
+    });
+
+    _audioPlayer.onDurationChanged.listen((newDuration) {
+      if (mounted) {
+        setState(() {
+          _duration = newDuration;
+        });
+      }
+    });
+
+    _audioPlayer.onPositionChanged.listen((newPosition) {
+      if (mounted) {
+        setState(() {
+          _position = newPosition;
+        });
+      }
+    });
+    
+    _audioPlayer.onPlayerComplete.listen((event) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _position = Duration.zero;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  void _togglePlay() async {
+    if (_isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.play(UrlSource(widget.mediaUrl));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: _togglePlay,
+          child: Icon(
+            _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+            color: widget.textColor,
+            size: 32,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 100,
+          height: 4,
+          decoration: BoxDecoration(
+            color: widget.textColor.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(2),
+          ),
+          alignment: Alignment.centerLeft,
+          child: Container(
+            width: _duration.inSeconds > 0
+                ? 100 * (_position.inSeconds / _duration.inSeconds)
+                : 40, // Mock progress
+            height: 4,
+            decoration: BoxDecoration(
+              color: widget.textColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          "0:12", // Mock duration
+          style: AppTypography.bodyMedium.copyWith(color: widget.textColor),
+        ),
+      ],
     );
   }
 }

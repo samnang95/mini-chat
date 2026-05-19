@@ -110,6 +110,7 @@ class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
                       value: controller.bio.value,
                       isDark: isDark,
                     ),
+                    SizedBox(height: Get.height * 0.02),
                     ProfileInfoTile(
                       icon: Icons.phone_outlined,
                       label: StringTranslateExtension(
@@ -118,6 +119,7 @@ class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
                       value: controller.phone.value,
                       isDark: isDark,
                     ),
+                    SizedBox(height: Get.height * 0.02),
                     ProfileInfoTile(
                       icon: Icons.email_outlined,
                       label: StringTranslateExtension(

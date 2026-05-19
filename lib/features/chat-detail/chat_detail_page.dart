@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -20,10 +21,7 @@ class ChatDetailPage extends GetView<ChatDetailController> {
     return Scaffold(
       appBar: XAppBar(
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: isDark ? AppColors.darkTextPrimary : Colors.black,
-          ),
+          icon: FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.black),
           onPressed: () => Get.back(),
         ),
         titleWidget: Obx(() {
@@ -47,22 +45,28 @@ class ChatDetailPage extends GetView<ChatDetailController> {
                         ),
                 ),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      controller.chatName.value,
-                      style: AppTypography.subtitle1.copyWith(
-                        color: isDark ? AppColors.darkTextPrimary : Colors.black,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        controller.chatName.value,
+                        style: AppTypography.subtitle1.copyWith(
+                          color: Colors.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      controller.chatStatus.value,
-                      style: AppTypography.caption.copyWith(
-                        color: isDark ? AppColors.darkTextSecondary : Colors.black45,
+                      Text(
+                        controller.chatStatus.value,
+                        style: AppTypography.caption.copyWith(
+                          color: Colors.black45,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -73,14 +77,14 @@ class ChatDetailPage extends GetView<ChatDetailController> {
             IconButton(
               icon: Icon(
                 Icons.video_call_rounded,
-                color: isDark ? AppColors.darkTextSecondary : Colors.black45,
+                color: Colors.black45,
               ),
               onPressed: () {},
             ),
             IconButton(
               icon: Icon(
                 Icons.phone,
-                color: isDark ? AppColors.darkTextSecondary : Colors.black45,
+                color: Colors.black45,
               ),
               onPressed: () {},
             ),
@@ -158,59 +162,171 @@ class ChatDetailPage extends GetView<ChatDetailController> {
                   FontAwesomeIcons.plus,
                   color: isDark ? AppColors.darkTextHint : Colors.grey,
                 ),
-                onPressed: () {},
+                onPressed: () => _showAttachmentOptions(context),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: TextField(
-                  controller: controller.messageController,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                  ),
-                  cursorColor: AppColors.primary,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => controller.sendMessage(),
-                  maxLines: 4,
-                  minLines: 1,
-                  decoration: InputDecoration(
-                    hintText: 'Message...',
-                    hintStyle: AppTypography.bodyLarge.copyWith(
-                      color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                child: Obx(() {
+                  if (controller.isRecording.value) {
+                    final duration = controller.recordingDuration.value;
+                    final minutes = (duration / 60).floor().toString().padLeft(
+                      2,
+                      '0',
+                    );
+                    final seconds = (duration % 60).toString().padLeft(2, '0');
+                    return Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.mic, color: Colors.red),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Recording... $minutes:$seconds',
+                            style: AppTypography.bodyLarge.copyWith(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return TextField(
+                    controller: controller.messageController,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
-                    filled: true,
-                    fillColor: isDark ? AppColors.darkDivider : AppColors.divider,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 12.0,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24.0),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                        width: 1.0,
+                    cursorColor: AppColors.primary,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => controller.sendMessage(),
+                    maxLines: 4,
+                    minLines: 1,
+                    decoration: InputDecoration(
+                      hintText: 'Message...',
+                      hintStyle: AppTypography.bodyLarge.copyWith(
+                        color: isDark
+                            ? AppColors.darkTextHint
+                            : AppColors.textHint,
+                      ),
+                      filled: true,
+                      fillColor: isDark
+                          ? AppColors.darkDivider
+                          : AppColors.divider,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 12.0,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.0,
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
               const SizedBox(width: 8),
-              IconButton(
-                icon: const FaIcon(
-                  FontAwesomeIcons.paperPlane,
-                  color: AppColors.primary,
-                ),
-                onPressed: controller.sendMessage,
-              ),
+              Obx(() {
+                if (controller.isUploading.value) {
+                  return const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  );
+                }
+
+                if (controller.isRecording.value) {
+                  return IconButton(
+                    icon: const Icon(
+                      Icons.stop_circle_rounded,
+                      color: Colors.red,
+                      size: 32,
+                    ),
+                    onPressed: controller.toggleRecording,
+                  );
+                }
+
+                return GestureDetector(
+                  onLongPress: controller.toggleRecording,
+                  child: IconButton(
+                    icon: FaIcon(
+                      FontAwesomeIcons.paperPlane,
+                      color: AppColors.primary,
+                    ),
+                    onPressed: controller.sendMessage,
+                  ),
+                );
+              }),
+              Obx(() {
+                if (!controller.isRecording.value &&
+                    !controller.isUploading.value) {
+                  return IconButton(
+                    icon: const Icon(Icons.mic, color: AppColors.primary),
+                    onPressed: controller.toggleRecording,
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showAttachmentOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library,
+                color: AppColors.primary,
+              ),
+              title: const Text('Gallery'),
+              onTap: () {
+                Get.back();
+                controller.sendImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.primary),
+              title: const Text('Camera'),
+              onTap: () {
+                Get.back();
+                controller.sendImage(ImageSource.camera);
+              },
+            ),
+          ],
         ),
       ),
     );

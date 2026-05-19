@@ -98,6 +98,7 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       showEdit: true,
                       onEdit: controller.editBio,
                     ),
+                    SizedBox(height: Get.height * 0.02),
                     ProfileInfoTile(
                       icon: Icons.phone_outlined,
                       label: StringTranslateExtension(
@@ -108,6 +109,7 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       showEdit: true,
                       onEdit: controller.editPhone,
                     ),
+                    SizedBox(height: Get.height * 0.02),
                     ProfileInfoTile(
                       icon: Icons.email_outlined,
                       label: StringTranslateExtension(
@@ -176,10 +178,20 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
             shape: BoxShape.circle,
             color: isDark ? AppColors.darkBackground : AppColors.white,
           ),
-          child: CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage(AppImages.image),
-          ),
+          child: Obx(() {
+            if (controller.isUploading.value) {
+              return const CircleAvatar(
+                radius: 50,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              );
+            }
+            return CircleAvatar(
+              radius: 50,
+              backgroundImage: controller.avatarUrl.value.isNotEmpty
+                  ? NetworkImage(controller.avatarUrl.value)
+                  : AssetImage(AppImages.image) as ImageProvider,
+            );
+          }),
         ),
         Positioned(
           bottom: 2,

@@ -11,6 +11,7 @@ import 'package:mini_chat/features/contact/widgets/invite_friend.dart';
 import 'package:mini_chat/features/contact/widgets/alphabetical_contact_list.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
+import 'package:mini_chat/core/services/user_service.dart';
 
 class ContactPage extends GetView<ContactController> {
   const ContactPage({super.key});
@@ -26,14 +27,24 @@ class ContactPage extends GetView<ContactController> {
         ),
         leading: GestureDetector(
           onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
-          child: ClipOval(
-            child: Image.asset(
-              AppImages.image,
-              width: 40,
-              height: 35,
-              fit: BoxFit.cover,
-            ),
-          ),
+          child: Obx(() {
+            final avatarUrl = Get.find<UserService>().currentUser.value?.avatarUrl ?? '';
+            return ClipOval(
+              child: avatarUrl.isNotEmpty
+                  ? Image.network(
+                      avatarUrl,
+                      width: 40,
+                      height: 35,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      AppImages.image,
+                      width: 40,
+                      height: 35,
+                      fit: BoxFit.cover,
+                    ),
+            );
+          }),
         ),
       ),
       body: Column(
@@ -42,7 +53,7 @@ class ContactPage extends GetView<ContactController> {
             padding:  EdgeInsets.all(16),
             child: InviteFriendCard(
               onTap: () {
-                print("Invite Friends clicked from Contact Page!");
+                controller.inviteFriend();
               },
             ),
           ),
