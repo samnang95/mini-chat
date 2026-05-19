@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/constants/app_images.dart';
+import 'package:mini_chat/core/services/user_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
@@ -24,14 +25,24 @@ class SettingsPage extends GetView<SettingsController> {
       appBar: XAppBar(
         leading: GestureDetector(
           onTap: () => Get.toNamed(AppRoutes.profileDetailPage),
-          child: ClipOval(
-            child: Image.asset(
-              AppImages.image,
-              width: 40,
-              height: 35,
-              fit: BoxFit.cover,
-            ),
-          ),
+          child: Obx(() {
+            final avatarUrl = Get.find<UserService>().currentUser.value?.avatarUrl ?? '';
+            return ClipOval(
+              child: avatarUrl.isNotEmpty
+                  ? Image.network(
+                      avatarUrl,
+                      width: 40,
+                      height: 35,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      AppImages.image,
+                      width: 40,
+                      height: 35,
+                      fit: BoxFit.cover,
+                    ),
+            );
+          }),
         ),
         titleWidget: XGradientText(
           StringTranslateExtension(LocaleKeys.settings).tr(),

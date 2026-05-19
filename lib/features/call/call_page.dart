@@ -8,6 +8,7 @@ import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/core/widgets/x_gradient_text.dart';
 import 'package:mini_chat/core/widgets/x_scaffold.dart';
+import 'package:mini_chat/core/services/user_service.dart';
 import 'package:mini_chat/features/call/call_controller.dart';
 
 class CallPage extends GetView<CallController> {
@@ -19,14 +20,24 @@ class CallPage extends GetView<CallController> {
 
     return XScaffold(
       appBar: XAppBar(
-        leading: ClipOval(
-          child: Image.asset(
-            AppImages.image,
-            width: 40,
-            height: 35,
-            fit: BoxFit.cover,
-          ),
-        ),
+        leading: Obx(() {
+          final avatarUrl = Get.find<UserService>().currentUser.value?.avatarUrl ?? '';
+          return ClipOval(
+            child: avatarUrl.isNotEmpty
+                ? Image.network(
+                    avatarUrl,
+                    width: 40,
+                    height: 35,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    AppImages.image,
+                    width: 40,
+                    height: 35,
+                    fit: BoxFit.cover,
+                  ),
+          );
+        }),
         titleWidget: XGradientText(
           StringTranslateExtension(LocaleKeys.call).tr(),
           colors: const [Color.fromARGB(255, 8, 8, 11), AppColors.accent],

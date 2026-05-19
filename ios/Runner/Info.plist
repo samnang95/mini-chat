@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Mini Chat needs access to your gallery to upload profile photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Mini Chat needs access to your camera to take profile photos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Mini Chat needs access to your microphone to record voice messages.</string>
 </dict>
 </plist>

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:mini_chat/app/app.dart';
 import 'package:mini_chat/app/config/flavor_config.dart';
 import 'package:mini_chat/firebase_options.dart';
@@ -22,6 +23,9 @@ Future<void> mainCommon(FlavorConfig config) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize local storage
+  await GetStorage.init();
 
   // Initialize localization
   await EasyLocalization.ensureInitialized();

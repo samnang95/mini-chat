@@ -47,7 +47,7 @@ class XAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       leading: leading != null
           ? Padding(
-              padding: const EdgeInsets.only(left: 24.0),
+              padding: const EdgeInsets.only(left: 18.0),
               child: Center(child: leading),
             )
           : null,

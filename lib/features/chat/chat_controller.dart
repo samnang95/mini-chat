@@ -77,6 +77,9 @@ class ChatController extends GetxController {
   }
 
   List<ConversationModel> get filteredConversations {
+    // Track userCache changes so Obx rebuilds the list when a user is loaded
+    final _ = userCache.length;
+    
     if (searchQuery.value.isEmpty) return conversations;
     return conversations.where((conv) {
       final user = getOtherUser(conv);
@@ -100,6 +103,24 @@ class ChatController extends GetxController {
     if (diff.inDays == 1) return 'Yesterday';
     if (diff.inDays < 7) return '${diff.inDays}d ago';
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  // ── Pull to Refresh ────────────────────────────────────
+  Future<void> refreshConversations() async {
+    // Re-fetch user cache (avatars, names may have changed)
+    userCache.clear();
+    for (final conv in conversations) {
+      final otherUid = conv.participants.firstWhere(
+        (uid) => uid != _currentUid,
+        orElse: () => '',
+      );
+      if (otherUid.isNotEmpty) {
+        final user = await _userService.getUserById(otherUid);
+        if (user != null) {
+          userCache[otherUid] = user;
+        }
+      }
+    }
   }
 
   @override
