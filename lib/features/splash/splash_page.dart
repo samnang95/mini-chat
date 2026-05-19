@@ -24,7 +24,7 @@ class SplashPage extends GetView<SplashController> {
             Column(
               children: [
                 Lottie.asset(AppAnimations.boxMessage,repeat: true),
-                SizedBox(height: 4),
+                SizedBox(height: 5),
                 XGradientText(
                   LocaleKeys.appName.tr(),
                   colors: [AppColors.primary, AppColors.accent],
