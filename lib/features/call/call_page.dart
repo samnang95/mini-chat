@@ -85,8 +85,13 @@ class CallPage extends GetView<CallController> {
                 ),
                 itemBuilder: (context, index) {
                   final call = controller.calls[index];
-                  final isMissed = call['missed'] == true;
-                  final isIncoming = call['type'] == 'incoming';
+                  final isMissed = call.missed;
+                  final isIncoming = controller.isIncoming(call);
+                  final otherUser = controller.getOtherUser(call);
+
+                  final name = otherUser?.name ?? 'Unknown User';
+                  final avatar = otherUser?.avatarUrl ?? '';
+                  final timeText = controller.getFormattedTime(call.createdAt);
 
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
@@ -94,9 +99,9 @@ class CallPage extends GetView<CallController> {
                       vertical: 4,
                     ),
                     leading: ClipOval(
-                      child: call['avatar'].toString().isNotEmpty
+                      child: avatar.isNotEmpty
                           ? Image.network(
-                              call['avatar'],
+                              avatar,
                               width: 48,
                               height: 48,
                               fit: BoxFit.cover,
@@ -109,7 +114,7 @@ class CallPage extends GetView<CallController> {
                             ),
                     ),
                     title: Text(
-                      call['name'],
+                      name,
                       style: AppTypography.subtitle1.copyWith(
                         color: isMissed
                             ? AppColors.error
@@ -130,7 +135,7 @@ class CallPage extends GetView<CallController> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          call['time'],
+                          timeText,
                           style: AppTypography.bodyMedium.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary
@@ -141,7 +146,7 @@ class CallPage extends GetView<CallController> {
                     ),
                     trailing: IconButton(
                       icon: Icon(
-                        call['media'] == 'video' ? Icons.videocam : Icons.call,
+                        call.media == 'video' ? Icons.videocam : Icons.call,
                         color: AppColors.primary,
                       ),
                       onPressed: () {

@@ -11,4 +11,7 @@ abstract class EnvConfig {
   static String get imagekitPublicKey => dotenv.env['IMAGEKIT_PUBLIC_KEY'] ?? '';
   static String get imagekitPrivateKey => dotenv.env['IMAGEKIT_PRIVATE_KEY'] ?? '';
   static String get imagekitUrlEndpoint => dotenv.env['IMAGEKIT_URL_ENDPOINT'] ?? '';
+
+  // ── Agora ─────────────────────────────────────────────
+  static String get agoraAppId => dotenv.env['AGORA_APP_ID'] ?? '';
 }

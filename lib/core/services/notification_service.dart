@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/core/services/user_service.dart';
+import 'package:googleapis_auth/auth_io.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message: ${message.messageId}');
@@ -92,6 +95,66 @@ class NotificationService extends GetxService {
           iOS: DarwinNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true),
         ),
       );
+    }
+  }
+
+  Future<void> sendPushNotification({
+    required String targetFcmToken,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      // 1. Load the service account JSON
+      final jsonString = await rootBundle.loadString('assets/services/service-account.json');
+      final accountCredentials = ServiceAccountCredentials.fromJson(jsonString);
+
+      // 2. Define the required Google API scopes
+      final scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+
+      // 3. Get the OAuth2 Client
+      final client = await clientViaServiceAccount(accountCredentials, scopes);
+
+      // Extract Project ID manually from the JSON string
+      final Map<String, dynamic> accountJson = jsonDecode(jsonString);
+      final projectId = accountJson['project_id'];
+
+      // 4. Construct the HTTP v1 URL
+      final url = Uri.parse('https://fcm.googleapis.com/v1/projects/$projectId/messages:send');
+
+      // 5. Build the Payload
+      final payload = {
+        'message': {
+          'token': targetFcmToken,
+          'notification': {
+            'title': title,
+            'body': body,
+          },
+          'data': {
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+          },
+        }
+      };
+
+      // 6. Send the POST Request
+      final response = await client.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Push notification sent successfully!');
+      } else {
+        print('❌ Failed to send push notification: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+
+      // Close the client
+      client.close();
+    } catch (e) {
+      print('❌ Error sending push notification: $e');
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/features/call-room/call_room_controller.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
 class CallRoomPage extends GetView<CallRoomController> {
   const CallRoomPage({super.key});
@@ -56,64 +57,144 @@ class CallRoomPage extends GetView<CallRoomController> {
                   ],
                 ),
                 
-                const Spacer(flex: 1),
-                
-                // Avatar & Info
-                Obx(() {
-                  return Column(
-                    children: [
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white24, width: 4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
-                              blurRadius: 30,
-                              spreadRadius: 10,
-                            ),
-                          ],
-                          image: controller.avatar.value.isNotEmpty
-                              ? DecorationImage(
-                                  image: NetworkImage(controller.avatar.value),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
-                        ),
-                        child: controller.avatar.value.isEmpty
-                            ? Center(
-                                child: Text(
-                                  controller.name.value.isNotEmpty
-                                      ? controller.name.value[0].toUpperCase()
-                                      : '?',
-                                  style: AppTypography.heading1.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 64,
+                // Avatar & Info (or Video View)
+                Expanded(
+                  flex: 3,
+                  child: Obx(() {
+                    if (controller.isVideo.value) {
+                      // Video Call Layout
+                      return Stack(
+                        children: [
+                          // Remote Video (Full Screen)
+                          Positioned.fill(
+                            child: controller.remoteUid.value != null
+                                ? AgoraVideoView(
+                                    controller: VideoViewController.remote(
+                                      rtcEngine: controller.engine,
+                                      canvas: VideoCanvas(uid: controller.remoteUid.value),
+                                      connection: RtcConnection(channelId: controller.channelName.value),
+                                    ),
+                                  )
+                                : const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                          ),
+                          
+                          // Local Video (Small box in corner)
+                          if (controller.localUserJoined.value && !controller.isVideoMuted.value)
+                            Positioned(
+                              top: 20,
+                              right: 20,
+                              width: 100,
+                              height: 150,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.white, width: 2),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.black54,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: AgoraVideoView(
+                                    controller: VideoViewController(
+                                      rtcEngine: controller.engine,
+                                      canvas: const VideoCanvas(uid: 0),
+                                    ),
                                   ),
                                 ),
-                              )
-                            : null,
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        controller.name.value,
-                        style: AppTypography.heading2.copyWith(color: Colors.white),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        controller.formattedDuration,
-                        style: AppTypography.subtitle1.copyWith(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-
-                const Spacer(flex: 2),
+                              ),
+                            ),
+                            
+                          // Call Info overlay
+                          Positioned(
+                            bottom: 20,
+                            left: 0,
+                            right: 0,
+                            child: Column(
+                              children: [
+                                Text(
+                                  controller.name.value,
+                                  style: AppTypography.heading2.copyWith(color: Colors.white, shadows: [Shadow(color: Colors.black54, blurRadius: 4)]),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  controller.remoteUid.value != null ? controller.formattedDuration : 'Connecting...',
+                                  style: AppTypography.subtitle1.copyWith(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w400,
+                                    shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Channel: ${controller.channelName.value}',
+                                  style: const TextStyle(color: Colors.white24, fontSize: 10, shadows: [Shadow(color: Colors.black54, blurRadius: 4)]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      // Voice Call Layout
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white24, width: 4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 30,
+                                  spreadRadius: 10,
+                                ),
+                              ],
+                              image: controller.avatar.value.isNotEmpty
+                                  ? DecorationImage(
+                                      image: NetworkImage(controller.avatar.value),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: controller.avatar.value.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      controller.name.value.isNotEmpty
+                                          ? controller.name.value[0].toUpperCase()
+                                          : '?',
+                                      style: AppTypography.heading1.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 64,
+                                      ),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            controller.name.value,
+                            style: AppTypography.heading2.copyWith(color: Colors.white),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            controller.remoteUid.value != null ? controller.formattedDuration : 'Calling...',
+                            style: AppTypography.subtitle1.copyWith(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Channel: ${controller.channelName.value}',
+                            style: const TextStyle(color: Colors.white24, fontSize: 10),
+                          ),
+                        ],
+                      );
+                    }
+                  }),
+                ),
 
                 // Call Controls
                 Container(

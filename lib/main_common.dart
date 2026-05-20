@@ -9,6 +9,7 @@ import 'package:mini_chat/app/app.dart';
 import 'package:mini_chat/app/config/flavor_config.dart';
 import 'package:mini_chat/firebase_options.dart';
 import 'package:mini_chat/core/services/notification_service.dart';
+import 'package:mini_chat/core/services/call_service.dart';
 
 Future<void> mainCommon(FlavorConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,9 @@ Future<void> mainCommon(FlavorConfig config) async {
 
   // Initialize Notification Service
   Get.putAsync(() => NotificationService().init());
+
+  // Initialize Call Service
+  Get.put(CallService());
 
   runApp(
     EasyLocalization(
