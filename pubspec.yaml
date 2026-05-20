@@ -22,7 +22,7 @@ dependencies:
   cloud_firestore: ^5.6.6
   firebase_storage: ^12.4.5
   firebase_messaging: ^15.0.3
-  flutter_local_notifications: ^17.2.1.post1
+  flutter_local_notifications: ^17.2.1
   image_picker: ^1.1.2
   get_storage: ^2.1.1
   record: ^6.2.0
