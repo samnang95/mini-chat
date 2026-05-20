@@ -46,6 +46,7 @@ app.*.map.json
 
 # Environment secrets (NEVER commit these)
 .env*
+assets/services/*.json
 !.env.example
 
 # AI/Agent Artifacts
