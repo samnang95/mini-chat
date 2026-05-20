@@ -71,6 +71,14 @@ class ChatController extends GetxController {
     return userCache[otherUid];
   }
 
+  int getUnreadCount(ConversationModel conv) {
+    return conv.unreadCounts[_currentUid] ?? 0;
+  }
+
+  int get totalUnreadCount {
+    return conversations.fold(0, (sum, conv) => sum + getUnreadCount(conv));
+  }
+
   // ── Search ─────────────────────────────────────────────
   void onSearchChanged(String query) {
     searchQuery.value = query;
@@ -79,9 +87,17 @@ class ChatController extends GetxController {
   List<ConversationModel> get filteredConversations {
     // Track userCache changes so Obx rebuilds the list when a user is loaded
     final _ = userCache.length;
+    // Track blocked users to rebuild when someone is blocked/unblocked
+    final blockedUsers = _userService.currentUser.value?.blockedUsers ?? [];
     
-    if (searchQuery.value.isEmpty) return conversations;
-    return conversations.where((conv) {
+    final unblockedConvs = conversations.where((conv) {
+      final otherUid = getOtherUserId(conv);
+      return !blockedUsers.contains(otherUid);
+    });
+
+    if (searchQuery.value.isEmpty) return unblockedConvs.toList();
+    
+    return unblockedConvs.where((conv) {
       final user = getOtherUser(conv);
       if (user == null) return false;
       return user.name.toLowerCase().contains(

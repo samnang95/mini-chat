@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mini_chat/core/services/storage_service.dart';
 import 'package:mini_chat/core/services/user_service.dart';
+import 'package:mini_chat/core/services/chat_service.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 
 class ProfileDetailController extends GetxController {
   final UserService _userService = Get.find<UserService>();
   final StorageService _storageService = Get.find<StorageService>();
+  final ChatService _chatService = Get.find<ChatService>();
 
   // ── Reactive User Data (from Firestore) ────────────────
   final name = ''.obs;
@@ -18,6 +20,13 @@ class ProfileDetailController extends GetxController {
   final avatarUrl = ''.obs;
   final isUploading = false.obs;
   final isMuted = false.obs;
+  final sharedMedia = <String>[].obs;
+  final friendUid = ''.obs;
+
+  bool get isBlocked {
+    if (friendUid.value.isEmpty) return false;
+    return _userService.currentUser.value?.blockedUsers.contains(friendUid.value) ?? false;
+  }
 
   // ── Text Editing Controllers (for My Profile edit) ─────
   late TextEditingController nameEditController;
@@ -31,11 +40,37 @@ class ProfileDetailController extends GetxController {
     bioEditController = TextEditingController();
     phoneEditController = TextEditingController();
 
-    // Load real user data
-    _loadUserData();
+    // Load data based on arguments
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null && args['uid'] != null) {
+      friendUid.value = args['uid'];
+      _loadFriendData(args['uid']);
+      if (args['conversationId'] != null) {
+        _loadSharedMedia(args['conversationId']);
+      }
+    } else {
+      _loadUserData();
+      ever(_userService.currentUser, (_) => _loadUserData());
+    }
+  }
 
-    // Listen for changes to currentUser
-    ever(_userService.currentUser, (_) => _loadUserData());
+  Future<void> _loadFriendData(String uid) async {
+    final user = await _userService.getUserById(uid);
+    if (user != null) {
+      name.value = user.name;
+      username.value = user.username.isNotEmpty
+          ? user.username
+          : '@${user.name.toLowerCase().replaceAll(' ', '_')}';
+      bio.value = user.bio;
+      phone.value = user.phone;
+      email.value = user.email;
+      avatarUrl.value = user.avatarUrl;
+    }
+  }
+
+  Future<void> _loadSharedMedia(String conversationId) async {
+    final media = await _chatService.getSharedMedia(conversationId);
+    sharedMedia.value = media;
   }
 
   void _loadUserData() {
@@ -246,9 +281,15 @@ class ProfileDetailController extends GetxController {
     isMuted.value = !isMuted.value;
   }
 
+  Future<void> toggleBlockUser() async {
+    if (friendUid.value.isNotEmpty) {
+      await _userService.toggleBlockUser(friendUid.value);
+    }
+  }
+
   void onMessageTap() {
-    // TODO: Navigate to chat with this user
-    Get.back();
+    Get.back(); // If already coming from ChatDetail, this closes the profile.
+    // Otherwise, we could check if we need to navigate, but since ChatPage passes to ChatDetail, this handles it simply.
   }
 
   void onAudioCallTap() {

@@ -6,6 +6,8 @@ class ConversationModel {
   final String lastMessage;
   final DateTime lastMessageTime;
   final String lastMessageSenderId;
+  final List<String> typingUsers;
+  final Map<String, int> unreadCounts;
 
   const ConversationModel({
     required this.id,
@@ -13,6 +15,8 @@ class ConversationModel {
     this.lastMessage = '',
     required this.lastMessageTime,
     this.lastMessageSenderId = '',
+    this.typingUsers = const [],
+    this.unreadCounts = const {},
   });
 
   factory ConversationModel.fromFirestore(DocumentSnapshot doc) {
@@ -24,6 +28,8 @@ class ConversationModel {
       lastMessageTime:
           (data['lastMessageTime'] as Timestamp?)?.toDate() ?? DateTime.now(),
       lastMessageSenderId: data['lastMessageSenderId'] ?? '',
+      typingUsers: List<String>.from(data['typingUsers'] ?? []),
+      unreadCounts: Map<String, int>.from(data['unreadCounts'] ?? {}),
     );
   }
 
@@ -33,6 +39,8 @@ class ConversationModel {
       'lastMessage': lastMessage,
       'lastMessageTime': Timestamp.fromDate(lastMessageTime),
       'lastMessageSenderId': lastMessageSenderId,
+      'typingUsers': typingUsers,
+      'unreadCounts': unreadCounts,
     };
   }
 }

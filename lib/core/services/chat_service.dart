@@ -64,12 +64,24 @@ class ChatService extends GetxService {
     // Add message to subcollection
     await _messagesRef(conversationId).add(message.toFirestore());
 
-    // Update conversation's last message
-    await _conversationsRef.doc(conversationId).update({
-      'lastMessage': text,
-      'lastMessageTime': Timestamp.fromDate(DateTime.now()),
-      'lastMessageSenderId': _currentUid,
-    });
+    final convDoc = await _conversationsRef.doc(conversationId).get();
+    if (convDoc.exists) {
+      final data = convDoc.data() as Map<String, dynamic>?;
+      final participants = List<String>.from(data?['participants'] ?? []);
+      final otherUid = participants.firstWhere((id) => id != _currentUid, orElse: () => '');
+
+      final updates = <String, dynamic>{
+        'lastMessage': text,
+        'lastMessageTime': Timestamp.fromDate(DateTime.now()),
+        'lastMessageSenderId': _currentUid,
+      };
+
+      if (otherUid.isNotEmpty) {
+        updates['unreadCounts.$otherUid'] = FieldValue.increment(1);
+      }
+
+      await _conversationsRef.doc(conversationId).update(updates);
+    }
   }
 
   // ── Stream Messages (real-time) ────────────────────────
@@ -91,5 +103,90 @@ class ChatService extends GetxService {
         .map((snapshot) => snapshot.docs
             .map((doc) => ConversationModel.fromFirestore(doc))
             .toList());
+  }
+
+  // ── Get Shared Media ───────────────────────────────────
+  Future<List<String>> getSharedMedia(String conversationId) async {
+    if (conversationId.isEmpty) return [];
+    try {
+      final snapshot = await _messagesRef(conversationId)
+          .where('type', isEqualTo: 'image')
+          .get();
+
+      final messages = snapshot.docs.map((doc) => MessageModel.fromFirestore(doc)).toList();
+      // Sort locally to avoid needing a Firestore composite index
+      messages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      return messages
+          .map((m) => m.mediaUrl ?? '')
+          .where((url) => url.isNotEmpty)
+          .toList();
+    } catch (e) {
+      print('Error getting shared media: $e');
+      return [];
+    }
+  }
+
+  // ── Set Typing Status ───────────────────────────────────
+  Future<void> setTypingStatus(String conversationId, bool isTyping) async {
+    if (conversationId.isEmpty) return;
+    
+    final update = isTyping
+        ? FieldValue.arrayUnion([_currentUid])
+        : FieldValue.arrayRemove([_currentUid]);
+        
+    try {
+      await _conversationsRef.doc(conversationId).update({
+        'typingUsers': update,
+      });
+    } catch (e) {
+      print('Failed to update typing status: $e');
+    }
+  }
+
+  // ── Mark Messages as Read ────────────────────────────────
+  Future<void> markMessagesAsRead(String conversationId, String currentUid) async {
+    if (conversationId.isEmpty) return;
+    try {
+      // Clear current user's unread count
+      await _conversationsRef.doc(conversationId).update({
+        'unreadCounts.$currentUid': 0,
+      });
+
+      final snapshot = await _messagesRef(conversationId)
+          .where('isRead', isEqualTo: false)
+          .get();
+
+      if (snapshot.docs.isEmpty) return;
+
+      final batch = _firestore.batch();
+      var count = 0;
+      for (final doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>?;
+        final senderId = data?['senderId'] as String?;
+        if (senderId != null && senderId != currentUid) {
+          batch.update(doc.reference, {'isRead': true});
+          count++;
+        }
+      }
+      if (count > 0) {
+        await batch.commit();
+      }
+    } catch (e) {
+      print('Failed to mark messages as read: $e');
+    }
+  }
+
+  // ── Delete Message ───────────────────────────────────────
+  Future<void> deleteMessage(String conversationId, String messageId) async {
+    if (conversationId.isEmpty || messageId.isEmpty) return;
+    try {
+      await _messagesRef(conversationId).doc(messageId).update({
+        'text': 'This message was deleted',
+        'type': 'deleted',
+      });
+    } catch (e) {
+      print('Failed to delete message: $e');
+    }
   }
 }

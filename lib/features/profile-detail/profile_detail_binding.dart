@@ -5,5 +5,6 @@ class ProfileDetailBinding extends Bindings{
   @override
   void dependencies(){
     Get.lazyPut(() => ProfileDetailController());
+    Get.lazyPut(() => ProfileDetailController(), tag: 'friend');
   }
 }

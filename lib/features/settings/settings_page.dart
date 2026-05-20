@@ -12,6 +12,7 @@ import 'package:mini_chat/core/widgets/x_button_switch.dart';
 import 'package:mini_chat/core/widgets/x_gradient_text.dart';
 import 'package:mini_chat/core/widgets/x_profile.dart';
 import 'package:mini_chat/core/widgets/x_scaffold.dart';
+import 'package:mini_chat/features/auth/auth_controller.dart';
 import 'package:mini_chat/features/auth/widgets/logout.dart';
 import 'package:mini_chat/features/settings/settings_controller.dart';
 import 'package:mini_chat/features/settings/widgets/subtitle.dart';
@@ -84,6 +85,7 @@ class SettingsPage extends GetView<SettingsController> {
                 ).tr(),
                 value: false,
                 onChanged: (val) {},
+                onTap: () => Get.toNamed(AppRoutes.changePasswordPage),
               ),
               XButtonSwitch(
                 isSwitch: false,
@@ -117,6 +119,15 @@ class SettingsPage extends GetView<SettingsController> {
               Subtitle(title: StringTranslateExtension(LocaleKeys.support).tr()),
               SizedBox(height: 8),
               XButtonSwitch(
+                icon: Icons.block_rounded,
+                title: 'Blocked Users', // Hardcoded for now
+                isSwitch: false,
+                onTap: () {
+                  Get.toNamed(AppRoutes.blockedUsersPage);
+                },
+                suffixIcon: FontAwesomeIcons.arrowRightLong,
+              ),
+              XButtonSwitch(
                 isSwitch: false,
                 suffixIcon: FontAwesomeIcons.arrowRightLong,
                 icon: FontAwesomeIcons.circleQuestion,
@@ -124,7 +135,11 @@ class SettingsPage extends GetView<SettingsController> {
                 value: false,
                 onChanged: (val) {},
               ),
-              Logout(),
+              Logout(
+                onPressed: () {
+                  Get.find<AuthController>().logout();
+                },
+              ),
             ],
           ),
         ),

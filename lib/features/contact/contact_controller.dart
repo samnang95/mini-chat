@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/services/chat_service.dart';
-// import 'package:mini_chat/core/services/user_service.dart';
-// import 'package:mini_chat/data/auth/models/user_model.dart';
+import 'package:mini_chat/core/services/user_service.dart';
 
 class ContactController extends GetxController {
-  // final UserService _userService = Get.find<UserService>();
+  final UserService _userService = Get.find<UserService>();
   final ChatService _chatService = Get.find<ChatService>();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -30,16 +29,30 @@ class ContactController extends GetxController {
 
     // Load real users from Firestore
     _loadUsers();
+
+    // Re-load if blocked users change
+    List<String> previousBlocked = _userService.currentUser.value?.blockedUsers ?? [];
+    ever(_userService.currentUser, (user) {
+      if (user != null) {
+        final currentBlocked = user.blockedUsers;
+        if (currentBlocked.length != previousBlocked.length || 
+            !currentBlocked.every((e) => previousBlocked.contains(e))) {
+          previousBlocked = List.from(currentBlocked);
+          _loadUsers();
+        }
+      }
+    });
   }
 
   // ── Load all registered users ──────────────────────────
   Future<void> _loadUsers() async {
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final blockedUsers = _userService.currentUser.value?.blockedUsers ?? [];
 
     final snapshot = await _firestore.collection('users').get();
 
     final users = snapshot.docs
-        .where((doc) => doc.id != currentUid) // Exclude myself
+        .where((doc) => doc.id != currentUid && !blockedUsers.contains(doc.id)) // Exclude myself and blocked users
         .map((doc) {
       final data = doc.data();
       return {

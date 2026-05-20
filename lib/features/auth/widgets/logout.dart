@@ -4,7 +4,9 @@ import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 
 class Logout extends StatelessWidget {
-  const Logout({super.key});
+  final VoidCallback? onPressed;
+
+  const Logout({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -12,8 +14,10 @@ class Logout extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      width: double.infinity,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: double.infinity,
       height: height * 0.07,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -32,6 +36,7 @@ class Logout extends StatelessWidget {
         child: Text(
           StringTranslateExtension(LocaleKeys.logout).tr(),
           style: AppTypography.bodyLarge.copyWith(color: colorScheme.tertiary),
+        ),
         ),
       ),
     );
