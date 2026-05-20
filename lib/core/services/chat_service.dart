@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:mini_chat/data/chat/models/conversation_model.dart';
 import 'package:mini_chat/data/chat/models/message_model.dart';
+import 'package:mini_chat/core/services/user_service.dart' as mini_chat_user_service;
+import 'package:mini_chat/core/services/notification_service.dart' as mini_chat_notification_service;
 
 class ChatService extends GetxService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -78,6 +80,33 @@ class ChatService extends GetxService {
 
       if (otherUid.isNotEmpty) {
         updates['unreadCounts.$otherUid'] = FieldValue.increment(1);
+
+        // Fetch other user's fcmToken and send push notification
+        try {
+          final otherUserDoc = await _firestore.collection('users').doc(otherUid).get();
+          final otherUserData = otherUserDoc.data();
+          final fcmToken = otherUserData?['fcmToken'] as String?;
+          
+          if (fcmToken != null && fcmToken.isNotEmpty) {
+            // Need UserService and NotificationService
+            // Note: Since these are globally registered, Get.find() is safe here.
+            final currentUserProfile = Get.find<mini_chat_user_service.UserService>().currentUser.value;
+            final senderName = currentUserProfile?.name ?? 'Someone';
+            
+            String bodyText = text;
+            if (type == 'image') bodyText = '📷 Sent an image';
+            if (type == 'voice') bodyText = '🎤 Sent a voice message';
+            if (type == 'location') bodyText = '📍 Shared a location';
+            
+            Get.find<mini_chat_notification_service.NotificationService>().sendPushNotification(
+              targetFcmToken: fcmToken,
+              title: senderName,
+              body: bodyText,
+            );
+          }
+        } catch (e) {
+          print('Error triggering push notification: $e');
+        }
       }
 
       await _conversationsRef.doc(conversationId).update(updates);

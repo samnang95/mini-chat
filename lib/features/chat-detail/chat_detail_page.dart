@@ -94,9 +94,12 @@ class ChatDetailPage extends GetView<ChatDetailController> {
                 Get.toNamed(
                   AppRoutes.callRoomPage,
                   arguments: {
+                    'uid': controller.otherUserId.value,
                     'name': controller.chatName.value,
                     'avatar': controller.chatAvatar.value,
                     'isVideo': true,
+                    'conversationId': controller.conversationId.value,
+                    'isCaller': true,
                   },
                 );
               },
@@ -110,9 +113,12 @@ class ChatDetailPage extends GetView<ChatDetailController> {
                 Get.toNamed(
                   AppRoutes.callRoomPage,
                   arguments: {
+                    'uid': controller.otherUserId.value,
                     'name': controller.chatName.value,
                     'avatar': controller.chatAvatar.value,
                     'isVideo': false,
+                    'conversationId': controller.conversationId.value,
+                    'isCaller': true,
                   },
                 );
               },
