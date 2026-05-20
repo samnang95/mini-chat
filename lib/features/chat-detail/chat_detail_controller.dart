@@ -6,10 +6,13 @@ import 'package:mini_chat/core/services/chat_service.dart';
 import 'package:mini_chat/core/services/user_service.dart';
 import 'package:mini_chat/core/services/storage_service.dart';
 import 'package:mini_chat/data/chat/models/message_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/services.dart';
+import 'package:mini_chat/core/theme/app_colors.dart';
 
 class ChatDetailController extends GetxController {
   final ChatService _chatService = Get.find<ChatService>();
@@ -20,21 +23,25 @@ class ChatDetailController extends GetxController {
   final chatName = ''.obs;
   final chatStatus = 'Online'.obs;
   final chatAvatar = ''.obs;
+  final isFriendTyping = false.obs;
+  final isUploading = false.obs;
   final conversationId = ''.obs;
   final otherUserId = ''.obs;
 
   final messages = <MessageModel>[].obs;
   final messageController = TextEditingController();
   final scrollController = ScrollController();
-  final isUploading = false.obs;
 
   // Voice recording state
   final _audioRecorder = AudioRecorder();
   final isRecording = false.obs;
   final recordingDuration = 0.obs;
   Timer? _recordingTimer;
+  Timer? _typingTimer;
 
   StreamSubscription? _messagesSubscription;
+  StreamSubscription? _userSubscription;
+  StreamSubscription? _conversationSubscription;
 
   String get _currentUid => _userService.currentUser.value?.uid ?? '';
 
@@ -54,16 +61,90 @@ class ChatDetailController extends GetxController {
     // Listen to real-time messages
     if (conversationId.value.isNotEmpty) {
       _listenToMessages();
+      _listenToConversation();
     }
+
+    messageController.addListener(_onTextChanged);
+
+    // Listen to friend's online status
+    if (otherUserId.value.isNotEmpty) {
+      _listenToFriendStatus();
+    }
+  }
+
+  void _onTextChanged() {
+    final text = messageController.text;
+    if (text.isNotEmpty) {
+      Get.find<ChatService>().setTypingStatus(conversationId.value, true);
+      
+      _typingTimer?.cancel();
+      _typingTimer = Timer(const Duration(seconds: 2), () {
+        Get.find<ChatService>().setTypingStatus(conversationId.value, false);
+      });
+    }
+  }
+
+  void _listenToConversation() {
+    _conversationSubscription = FirebaseFirestore.instance
+        .collection('conversations')
+        .doc(conversationId.value)
+        .snapshots()
+        .listen((doc) {
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final typingUsers = List<String>.from(data['typingUsers'] ?? []);
+        isFriendTyping.value = typingUsers.contains(otherUserId.value);
+      }
+    });
+  }
+
+  void _listenToFriendStatus() {
+    // We need to listen directly to the Firestore document for the friend
+    _userSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(otherUserId.value)
+        .snapshots()
+        .listen((doc) {
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final isOnline = data['isOnline'] ?? false;
+        if (isOnline) {
+          chatStatus.value = 'Online';
+        } else {
+          final lastSeen = (data['lastSeen'] as dynamic)?.toDate();
+          if (lastSeen != null) {
+            chatStatus.value = _formatLastSeen(lastSeen);
+          } else {
+            chatStatus.value = 'Offline';
+          }
+        }
+      }
+    });
+  }
+
+  String _formatLastSeen(DateTime dateTime) {
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
+
+    if (diff.inMinutes < 1) return 'Last seen just now';
+    if (diff.inHours < 1) return 'Last seen ${diff.inMinutes}m ago';
+    if (diff.inDays < 1) {
+      return 'Last seen at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    }
+    if (diff.inDays == 1) return 'Last seen yesterday';
+    if (diff.inDays < 7) return 'Last seen ${diff.inDays}d ago';
+    return 'Last seen ${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
   void _listenToMessages() {
     _messagesSubscription = _chatService
         .getMessages(conversationId.value)
-        .listen((messageList) {
-      messages.value = messageList;
-      // Auto-scroll to bottom on new messages
+        .listen((msgList) {
+      messages.value = msgList;
       _scrollToBottom();
+      
+      // Mark received messages as read
+      _chatService.markMessagesAsRead(conversationId.value, _currentUid);
     });
   }
 
@@ -85,6 +166,8 @@ class ChatDetailController extends GetxController {
     if (text.isEmpty) return;
 
     messageController.clear();
+    _typingTimer?.cancel();
+    Get.find<ChatService>().setTypingStatus(conversationId.value, false);
 
     // Create conversation if it doesn't exist yet
     if (conversationId.value.isEmpty && otherUserId.value.isNotEmpty) {
@@ -215,6 +298,42 @@ class ChatDetailController extends GetxController {
     }
   }
 
+  // ── Message Options ────────────────────────────────────
+  void showMessageOptions(BuildContext context, MessageModel msg) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            if (msg.type == 'text')
+              ListTile(
+                leading: const Icon(Icons.copy, color: AppColors.primary),
+                title: const Text('Copy Text'),
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: msg.text));
+                  Get.back();
+                  Get.snackbar('Copied', 'Message copied to clipboard');
+                },
+              ),
+            if (isMyMessage(msg))
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                title: const Text('Delete for Everyone', style: TextStyle(color: Colors.red)),
+                onTap: () async {
+                  Get.back();
+                  await _chatService.deleteMessage(conversationId.value, msg.id);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Check if message is from me ────────────────────────
   bool isMyMessage(MessageModel message) {
     return message.senderId == _currentUid;
@@ -223,6 +342,9 @@ class ChatDetailController extends GetxController {
   @override
   void onClose() {
     _messagesSubscription?.cancel();
+    _userSubscription?.cancel();
+    _conversationSubscription?.cancel();
+    _typingTimer?.cancel();
     messageController.dispose();
     scrollController.dispose();
     super.onClose();

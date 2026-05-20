@@ -5,6 +5,7 @@ import 'package:mini_chat/core/constants/locale_keys.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/features/call/call_page.dart';
 import 'package:mini_chat/features/chat/chat_page.dart';
+import 'package:mini_chat/features/chat/chat_controller.dart';
 import 'package:mini_chat/features/contact/contact_page.dart';
 import 'package:mini_chat/features/main/main_controller.dart';
 import 'package:mini_chat/features/main/widgets/nav_item.dart';
@@ -16,6 +17,7 @@ class MainPage extends GetView<MainController> {
   @override
   Widget build(BuildContext context) {
     final navHeight = MediaQuery.of(context).size.height * 0.1;
+    final chatController = Get.find<ChatController>();
 
     return Scaffold(
       body: PageView(
@@ -41,6 +43,7 @@ class MainPage extends GetView<MainController> {
                 label: StringTranslateExtension(LocaleKeys.mainChat).tr(),
                 isSelected: controller.currentIndex.value == 0,
                 height: navHeight,
+                badgeCount: chatController.totalUnreadCount,
                 onTap: () => controller.changePage(0),
               ),
               NavItem(

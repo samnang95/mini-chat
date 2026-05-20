@@ -13,4 +13,7 @@ abstract class AppRoutes {
   static const loginPage = '/loginPage';
   static const registerPage = '/registerPage';
   static const startPage = '/startPage';
+  static const blockedUsersPage = '/blockedUsersPage';
+  static const callRoomPage = '/callRoomPage';
+  static const changePasswordPage = '/changePasswordPage';
 }

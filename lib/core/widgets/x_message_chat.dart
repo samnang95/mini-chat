@@ -11,6 +11,7 @@ class XMessageChat extends StatelessWidget {
   final bool isRead;
   final String type; // 'text', 'image', 'voice'
   final String? mediaUrl;
+  final VoidCallback? onLongPress;
 
   const XMessageChat({
     super.key,
@@ -20,6 +21,7 @@ class XMessageChat extends StatelessWidget {
     this.isRead = false,
     this.type = 'text',
     this.mediaUrl,
+    this.onLongPress,
   });
 
   Widget _buildMessageContent(Color textColor, bool isDark) {
@@ -122,7 +124,10 @@ class XMessageChat extends StatelessWidget {
     // Default to text
     return Text(
       message,
-      style: AppTypography.bodyLarge.copyWith(color: textColor),
+      style: AppTypography.bodyLarge.copyWith(
+        color: textColor,
+        fontStyle: type == 'deleted' ? FontStyle.italic : FontStyle.normal,
+      ),
     );
   }
 
@@ -141,8 +146,10 @@ class XMessageChat extends StatelessWidget {
         ? AppColors.bubbleSentText
         : (isDark ? AppColors.bubbleReceivedTextDark : AppColors.bubbleReceivedText);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
@@ -186,6 +193,7 @@ class XMessageChat extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -218,7 +226,17 @@ class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
   }
 
   Future<void> _initAudio() async {
-    await _audioPlayer.setSourceUrl(widget.mediaUrl);
+    try {
+      await _audioPlayer.setSourceUrl(widget.mediaUrl);
+      final duration = await _audioPlayer.getDuration();
+      if (duration != null && mounted) {
+        setState(() {
+          _duration = duration;
+        });
+      }
+    } catch (e) {
+      print('Error setting audio source: $e');
+    }
     
     _audioPlayer.onPlayerStateChanged.listen((state) {
       if (mounted) {
@@ -260,6 +278,12 @@ class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
     super.dispose();
   }
 
+  String _formatDuration(Duration d) {
+    final minutes = d.inMinutes;
+    final seconds = d.inSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
   void _togglePlay() async {
     if (_isPlaying) {
       await _audioPlayer.pause();
@@ -291,9 +315,9 @@ class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
           ),
           alignment: Alignment.centerLeft,
           child: Container(
-            width: _duration.inSeconds > 0
-                ? 100 * (_position.inSeconds / _duration.inSeconds)
-                : 40, // Mock progress
+            width: _duration.inMilliseconds > 0
+                ? 100 * (_position.inMilliseconds / _duration.inMilliseconds)
+                : 0,
             height: 4,
             decoration: BoxDecoration(
               color: widget.textColor,
@@ -303,7 +327,9 @@ class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
         ),
         const SizedBox(width: 8),
         Text(
-          "0:12", // Mock duration
+          _duration.inSeconds > 0 
+              ? (_isPlaying ? _formatDuration(_position) : _formatDuration(_duration))
+              : "--:--",
           style: AppTypography.bodyMedium.copyWith(color: widget.textColor),
         ),
       ],

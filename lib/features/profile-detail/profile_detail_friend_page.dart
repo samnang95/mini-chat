@@ -13,6 +13,9 @@ class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
   const ProfileDetailFriendPage({super.key});
 
   @override
+  String? get tag => 'friend';
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
@@ -140,7 +143,10 @@ class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
                       ),
                     ),
                     const SizedBox(height: AppDimens.spacing12),
-                    ProfileSharedMediaGrid(isDark: isDark),
+                    Obx(() => ProfileSharedMediaGrid(
+                      isDark: isDark,
+                      mediaUrls: controller.sharedMedia.toList(),
+                    )),
 
                     SizedBox(height: Get.height * 0.03),
 
@@ -162,14 +168,14 @@ class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
                       ),
                     ),
                     ProfileSettingTile(
-                      icon: Icons.block_rounded,
-                      label: StringTranslateExtension(
-                        LocaleKeys.profileBlockUser,
-                      ).tr(),
+                      icon: controller.isBlocked ? Icons.block_flipped : Icons.block_rounded,
+                      label: controller.isBlocked
+                          ? "Unblock User" 
+                          : StringTranslateExtension(LocaleKeys.profileBlockUser).tr(),
                       isDark: isDark,
-                      isDestructive: true,
+                      isDestructive: !controller.isBlocked, // Make it red only when blocking
                       onTap: () {
-                        // TODO: Block user
+                        controller.toggleBlockUser();
                       },
                     ),
 
@@ -192,9 +198,13 @@ class ProfileDetailFriendPage extends GetView<ProfileDetailController> {
         shape: BoxShape.circle,
         color: isDark ? AppColors.darkBackground : AppColors.white,
       ),
-      child: CircleAvatar(
-        radius: 50,
-        backgroundImage: AssetImage(AppImages.image),
+      child: Obx(
+        () => CircleAvatar(
+          radius: 50,
+          backgroundImage: controller.avatarUrl.value.isNotEmpty
+              ? NetworkImage(controller.avatarUrl.value)
+              : AssetImage(AppImages.image) as ImageProvider,
+        ),
       ),
     );
   }

@@ -5,6 +5,8 @@ import 'package:mini_chat/features/auth/login_page.dart';
 import 'package:mini_chat/features/auth/register_page.dart';
 import 'package:mini_chat/features/call/call_binding.dart';
 import 'package:mini_chat/features/call/call_page.dart';
+import 'package:mini_chat/features/call-room/call_room_binding.dart';
+import 'package:mini_chat/features/call-room/call_room_page.dart';
 import 'package:mini_chat/features/chat-detail/chat_detail_binding.dart';
 import 'package:mini_chat/features/chat-detail/chat_detail_page.dart';
 import 'package:mini_chat/features/chat/chat_binding.dart';
@@ -22,6 +24,8 @@ import 'package:mini_chat/features/profile-detail/profile_detail_page.dart';
 import 'package:mini_chat/features/profile-detail/profile_detail_friend_page.dart';
 import 'package:mini_chat/features/settings/settings_binding.dart';
 import 'package:mini_chat/features/settings/settings_page.dart';
+import 'package:mini_chat/features/settings/blocked_users_page.dart';
+import 'package:mini_chat/features/settings/change_password_page.dart';
 import 'package:mini_chat/features/splash/splash_binding.dart';
 import 'package:mini_chat/features/splash/splash_page.dart';
 import 'package:mini_chat/features/start-page/start_binding.dart';
@@ -98,6 +102,19 @@ class AppPages {
       name: AppRoutes.profileDetailFriendPage,
       page: () => const ProfileDetailFriendPage(),
       binding: ProfileDetailBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.blockedUsersPage,
+      page: () => const BlockedUsersPage(),
+    ),
+    GetPage(
+      name: AppRoutes.callRoomPage,
+      page: () => const CallRoomPage(),
+      binding: CallRoomBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.changePasswordPage,
+      page: () => const ChangePasswordPage(),
     ),
   ];
 }

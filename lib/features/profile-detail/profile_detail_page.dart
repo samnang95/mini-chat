@@ -130,7 +130,10 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       ),
                     ),
                     const SizedBox(height: AppDimens.spacing12),
-                    ProfileSharedMediaGrid(isDark: isDark),
+                    ProfileSharedMediaGrid(
+                      isDark: isDark,
+                      mediaUrls: const [],
+                    ),
 
                     SizedBox(height: Get.height * 0.02),
 

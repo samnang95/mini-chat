@@ -16,6 +16,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -36,12 +37,10 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            applicationIdSuffix = ".dev"
             resValue("string", "app_name", "Mini Chat Dev")
         }
         create("staging") {
             dimension = "environment"
-            applicationIdSuffix = ".staging"
             resValue("string", "app_name", "Mini Chat Staging")
         }
         create("prod") {
@@ -59,4 +58,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

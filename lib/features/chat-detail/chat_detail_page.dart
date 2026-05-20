@@ -26,7 +26,13 @@ class ChatDetailPage extends GetView<ChatDetailController> {
         ),
         titleWidget: Obx(() {
           return GestureDetector(
-            onTap: () => Get.toNamed(AppRoutes.profileDetailFriendPage),
+            onTap: () => Get.toNamed(
+              AppRoutes.profileDetailFriendPage,
+              arguments: {
+                'uid': controller.otherUserId.value,
+                'conversationId': controller.conversationId.value,
+              },
+            ),
             child: Row(
               children: [
                 ClipOval(
@@ -58,9 +64,14 @@ class ChatDetailPage extends GetView<ChatDetailController> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        controller.chatStatus.value,
+                        controller.isFriendTyping.value ? 'Typing...' : controller.chatStatus.value,
                         style: AppTypography.caption.copyWith(
-                          color: Colors.black45,
+                          color: controller.isFriendTyping.value 
+                              ? AppColors.primary 
+                              : Colors.black45,
+                          fontWeight: controller.isFriendTyping.value 
+                              ? FontWeight.w600 
+                              : FontWeight.normal,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -79,14 +90,32 @@ class ChatDetailPage extends GetView<ChatDetailController> {
                 Icons.video_call_rounded,
                 color: Colors.black45,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed(
+                  AppRoutes.callRoomPage,
+                  arguments: {
+                    'name': controller.chatName.value,
+                    'avatar': controller.chatAvatar.value,
+                    'isVideo': true,
+                  },
+                );
+              },
             ),
             IconButton(
               icon: Icon(
                 Icons.phone,
                 color: Colors.black45,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed(
+                  AppRoutes.callRoomPage,
+                  arguments: {
+                    'name': controller.chatName.value,
+                    'avatar': controller.chatAvatar.value,
+                    'isVideo': false,
+                  },
+                );
+              },
             ),
           ],
         ),
@@ -138,6 +167,11 @@ class ChatDetailPage extends GetView<ChatDetailController> {
               isRead: msg.isRead,
               type: msg.type,
               mediaUrl: msg.mediaUrl,
+              onLongPress: () {
+                if (msg.type != 'deleted') {
+                  controller.showMessageOptions(context, msg);
+                }
+              },
             );
           },
         );

@@ -142,7 +142,13 @@ class ChatPage extends GetView<ChatController> {
                     child: ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: GestureDetector(
-                        onTap: () => Get.toNamed(AppRoutes.profileDetailFriendPage),
+                        onTap: () => Get.toNamed(
+                          AppRoutes.profileDetailFriendPage,
+                          arguments: {
+                            'uid': otherUserId,
+                            'conversationId': conv.id,
+                          },
+                        ),
                         child: CircleAvatar(
                           radius: 24,
                           backgroundColor: AppColors.primary.withOpacity(0.2),
@@ -175,13 +181,43 @@ class ChatPage extends GetView<ChatController> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      trailing: Text(
-                        controller.formatTime(conv.lastMessageTime),
-                        style: AppTypography.caption.copyWith(
-                          color: isDark
-                              ? AppColors.darkTextHint
-                              : AppColors.textHint,
-                        ),
+                      trailing: Builder(
+                        builder: (context) {
+                          final unreadCount = controller.getUnreadCount(conv);
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                controller.formatTime(conv.lastMessageTime),
+                                style: AppTypography.caption.copyWith(
+                                  color: unreadCount > 0 
+                                      ? AppColors.primary 
+                                      : (isDark ? AppColors.darkTextHint : AppColors.textHint),
+                                  fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                              if (unreadCount > 0) ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.error,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                    style: AppTypography.caption.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        }
                       ),
                       onTap: () {
                         Get.toNamed(

@@ -77,6 +77,7 @@ class ProfileInfoTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCard : AppColors.background,
           borderRadius: AppDimens.borderRadiusMedium,
+          boxShadow: isDark ? null : AppDimens.shadowLight,
         ),
         child: Row(
           children: [
@@ -154,6 +155,7 @@ class ProfileSettingTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCard : AppColors.background,
           borderRadius: AppDimens.borderRadiusMedium,
+          boxShadow: isDark ? null : AppDimens.shadowLight,
         ),
         child: Row(
           children: [
@@ -176,11 +178,30 @@ class ProfileSettingTile extends StatelessWidget {
 // ── Shared Media Grid ────────────────────────────────────
 class ProfileSharedMediaGrid extends StatelessWidget {
   final bool isDark;
+  final List<String> mediaUrls;
 
-  const ProfileSharedMediaGrid({super.key, required this.isDark});
+  const ProfileSharedMediaGrid({
+    super.key,
+    required this.isDark,
+    required this.mediaUrls,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (mediaUrls.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppDimens.spacing24),
+          child: Text(
+            'No media shared yet',
+            style: AppTypography.bodyMedium.copyWith(
+              color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+            ),
+          ),
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -189,17 +210,22 @@ class ProfileSharedMediaGrid extends StatelessWidget {
         crossAxisSpacing: AppDimens.spacing8,
         mainAxisSpacing: AppDimens.spacing8,
       ),
-      itemCount: 6,
+      itemCount: mediaUrls.length > 9 ? 9 : mediaUrls.length, // Max 9 images
       itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
+        return ClipRRect(
+          borderRadius: AppDimens.borderRadiusMedium,
+          child: Container(
             color: isDark ? AppColors.darkSurface : AppColors.background,
-            borderRadius: AppDimens.borderRadiusMedium,
-          ),
-          child: Icon(
-            Icons.image_outlined,
-            color: isDark ? AppColors.darkTextHint : AppColors.textHint,
-            size: AppDimens.iconLarge,
+            child: Image.network(
+              mediaUrls[index],
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.image_not_supported_outlined,
+                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                );
+              },
+            ),
           ),
         );
       },

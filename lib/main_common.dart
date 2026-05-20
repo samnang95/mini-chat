@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 import 'package:mini_chat/app/app.dart';
 import 'package:mini_chat/app/config/flavor_config.dart';
 import 'package:mini_chat/firebase_options.dart';
+import 'package:mini_chat/core/services/notification_service.dart';
 
 Future<void> mainCommon(FlavorConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +17,14 @@ Future<void> mainCommon(FlavorConfig config) async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+  // Make status bar transparent globally on Android
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   // Load the .env file for the current flavor
   await dotenv.load(fileName: config.envFileName);
@@ -29,6 +39,9 @@ Future<void> mainCommon(FlavorConfig config) async {
 
   // Initialize localization
   await EasyLocalization.ensureInitialized();
+
+  // Initialize Notification Service
+  Get.putAsync(() => NotificationService().init());
 
   runApp(
     EasyLocalization(
