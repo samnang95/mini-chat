@@ -140,8 +140,13 @@ class ChatDetailController extends GetxController {
     _messagesSubscription = _chatService
         .getMessages(conversationId.value)
         .listen((msgList) {
+      final previousCount = messages.length;
       messages.value = msgList;
-      _scrollToBottom();
+
+      // Only scroll to bottom when a new message arrives, not on reaction updates
+      if (msgList.length > previousCount) {
+        _scrollToBottom();
+      }
       
       // Mark received messages as read
       _chatService.markMessagesAsRead(conversationId.value, _currentUid);
@@ -298,6 +303,13 @@ class ChatDetailController extends GetxController {
     }
   }
 
+  // ── Emoji Reactions ─────────────────────────────────────
+  static const reactionEmojis = ['❤️', '😂', '👍', '😮', '😢', '🔥'];
+
+  Future<void> toggleReaction(MessageModel msg, String emoji) async {
+    await _chatService.toggleReaction(conversationId.value, msg.id, emoji);
+  }
+
   // ── Message Options ────────────────────────────────────
   void showMessageOptions(BuildContext context, MessageModel msg) {
     showModalBottomSheet(
@@ -307,8 +319,41 @@ class ChatDetailController extends GetxController {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => SafeArea(
-        child: Wrap(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
+            // ── Emoji Reaction Picker ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: reactionEmojis.map((emoji) {
+                  final hasReacted = msg.reactions[emoji]?.contains(_currentUid) ?? false;
+                  return GestureDetector(
+                    onTap: () {
+                      Get.back();
+                      toggleReaction(msg, emoji);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: hasReacted
+                            ? AppColors.primary.withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        emoji,
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const Divider(height: 1),
+            // ── Other options ──
             if (msg.type == 'text')
               ListTile(
                 leading: const Icon(Icons.copy, color: AppColors.primary),

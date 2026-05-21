@@ -16,4 +16,5 @@ abstract class AppRoutes {
   static const blockedUsersPage = '/blockedUsersPage';
   static const callRoomPage = '/callRoomPage';
   static const changePasswordPage = '/changePasswordPage';
+  static const forgotPasswordPage = '/forgotPasswordPage';
 }

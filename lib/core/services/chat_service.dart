@@ -212,10 +212,45 @@ class ChatService extends GetxService {
     try {
       await _messagesRef(conversationId).doc(messageId).update({
         'text': 'This message was deleted',
-        'type': 'deleted',
+         'type': 'deleted',
       });
     } catch (e) {
       print('Failed to delete message: $e');
+    }
+  }
+
+  // ── Toggle Reaction on Message ───────────────────────────
+  Future<void> toggleReaction(String conversationId, String messageId, String emoji) async {
+    if (conversationId.isEmpty || messageId.isEmpty) return;
+    try {
+      final docRef = _messagesRef(conversationId).doc(messageId);
+      final doc = await docRef.get();
+      if (!doc.exists) return;
+
+      final data = doc.data() as Map<String, dynamic>?;
+      final reactions = data?['reactions'] as Map<String, dynamic>? ?? {};
+      final userList = List<String>.from(reactions[emoji] ?? []);
+
+      if (userList.contains(_currentUid)) {
+        // Same emoji tapped again → remove it (toggle off)
+        await docRef.update({
+          'reactions.$emoji': FieldValue.arrayRemove([_currentUid]),
+        });
+      } else {
+        // Remove user from any previous reaction first
+        final updates = <String, dynamic>{};
+        for (final entry in reactions.entries) {
+          final users = List<String>.from(entry.value ?? []);
+          if (users.contains(_currentUid)) {
+            updates['reactions.${entry.key}'] = FieldValue.arrayRemove([_currentUid]);
+          }
+        }
+        // Add user to the new emoji
+        updates['reactions.$emoji'] = FieldValue.arrayUnion([_currentUid]);
+        await docRef.update(updates);
+      }
+    } catch (e) {
+      print('Failed to toggle reaction: $e');
     }
   }
 }

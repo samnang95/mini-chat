@@ -159,25 +159,39 @@ class ChatDetailPage extends GetView<ChatDetailController> {
         return ListView.builder(
           controller: controller.scrollController,
           padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-          itemCount: controller.messages.length + 1,
+          itemCount: controller.messages.length,
           itemBuilder: (context, index) {
-            if (index == 0) {
-              return const XChatDateHeader(date: "Today");
-            }
-            final msg = controller.messages[index - 1];
+            final msg = controller.messages[index];
             final isMe = controller.isMyMessage(msg);
-            return XMessageChat(
-              isMe: isMe,
-              message: msg.text,
-              time: _formatTime(msg.createdAt),
-              isRead: msg.isRead,
-              type: msg.type,
-              mediaUrl: msg.mediaUrl,
-              onLongPress: () {
-                if (msg.type != 'deleted') {
-                  controller.showMessageOptions(context, msg);
-                }
-              },
+
+            // Show date header when the date changes
+            final showDateHeader = index == 0 ||
+                !_isSameDay(
+                  controller.messages[index - 1].createdAt,
+                  msg.createdAt,
+                );
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (showDateHeader)
+                  XChatDateHeader(date: _formatDate(msg.createdAt)),
+                XMessageChat(
+                  isMe: isMe,
+                  message: msg.text,
+                  time: _formatTime(msg.createdAt),
+                  isRead: msg.isRead,
+                  type: msg.type,
+                  mediaUrl: msg.mediaUrl,
+                  reactions: msg.reactions,
+                  onReactionTap: (emoji) => controller.toggleReaction(msg, emoji),
+                  onLongPress: () {
+                    if (msg.type != 'deleted') {
+                      controller.showMessageOptions(context, msg);
+                    }
+                  },
+                ),
+              ],
             );
           },
         );
@@ -376,5 +390,29 @@ class ChatDetailPage extends GetView<ChatDetailController> {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  String _formatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDay = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    final diff = today.difference(messageDay).inDays;
+
+    if (diff == 0) return 'Today';
+    if (diff == 1) return 'Yesterday';
+
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+
+    if (dateTime.year == now.year) {
+      return '${months[dateTime.month - 1]} ${dateTime.day}';
+    }
+    return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year}';
   }
 }

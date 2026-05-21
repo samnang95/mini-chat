@@ -5,6 +5,7 @@ import 'package:mini_chat/core/services/storage_service.dart';
 import 'package:mini_chat/core/services/user_service.dart';
 import 'package:mini_chat/core/services/chat_service.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 
 class ProfileDetailController extends GetxController {
   final UserService _userService = Get.find<UserService>();
@@ -293,10 +294,30 @@ class ProfileDetailController extends GetxController {
   }
 
   void onAudioCallTap() {
-    // TODO: Start audio call
+    if (friendUid.value.isEmpty) return;
+    Get.toNamed(
+      AppRoutes.callRoomPage,
+      arguments: {
+        'uid': friendUid.value,
+        'name': name.value,
+        'avatar': avatarUrl.value,
+        'isVideo': false,
+        'isCaller': true,
+      },
+    );
   }
 
   void onVideoCallTap() {
-    // TODO: Start video call
+    if (friendUid.value.isEmpty) return;
+    Get.toNamed(
+      AppRoutes.callRoomPage,
+      arguments: {
+        'uid': friendUid.value,
+        'name': name.value,
+        'avatar': avatarUrl.value,
+        'isVideo': true,
+        'isCaller': true,
+      },
+    );
   }
 }

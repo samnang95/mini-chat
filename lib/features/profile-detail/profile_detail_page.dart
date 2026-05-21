@@ -9,6 +9,7 @@ import 'package:mini_chat/core/theme/app_dimens.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 import 'package:mini_chat/features/profile-detail/profile_detail_controller.dart';
 import 'package:mini_chat/features/profile-detail/widgets/profile_widgets.dart';
+import 'package:mini_chat/app/routes/app_routes.dart';
 
 class ProfileDetailPage extends GetView<ProfileDetailController> {
   const ProfileDetailPage({super.key});
@@ -145,7 +146,7 @@ class ProfileDetailPage extends GetView<ProfileDetailController> {
                       ).tr(),
                       isDark: isDark,
                       onTap: () {
-                        // TODO: Change password
+                        Get.toNamed(AppRoutes.changePasswordPage);
                       },
                     ),
                     ProfileSettingTile(
