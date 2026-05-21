@@ -137,100 +137,126 @@ class ChatPage extends GetView<ChatController> {
                   final otherUser = controller.getOtherUser(conv);
                   final otherUserId = controller.getOtherUserId(conv);
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: GestureDetector(
-                        onTap: () => Get.toNamed(
-                          AppRoutes.profileDetailFriendPage,
-                          arguments: {
-                            'uid': otherUserId,
-                            'conversationId': conv.id,
-                          },
+                  // Staggered animation: each item fades + slides in
+                  final delay = Duration(milliseconds: 50 * (index < 10 ? index : 0));
+                  return TweenAnimationBuilder<double>(
+                    key: ValueKey(conv.id),
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(0, 20 * (1 - value)),
+                        child: Opacity(
+                          opacity: value.clamp(0.0, 1.0),
+                          child: child,
                         ),
-                        child: CircleAvatar(
-                          radius: 24,
-                          backgroundColor: AppColors.primary.withOpacity(0.2),
-                          backgroundImage: (otherUser?.avatarUrl ?? '').isNotEmpty
-                              ? NetworkImage(otherUser!.avatarUrl)
-                              : null,
-                          child: (otherUser?.avatarUrl ?? '').isEmpty
-                              ? Text(
-                                  (otherUser?.name ?? '?')[0].toUpperCase(),
-                                  style: AppTypography.heading2.copyWith(
-                                    color: AppColors.primary,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: GestureDetector(
+                          onTap: () => Get.toNamed(
+                            AppRoutes.profileDetailFriendPage,
+                            arguments: {
+                              'uid': otherUserId,
+                              'conversationId': conv.id,
+                            },
+                          ),
+                          child: CircleAvatar(
+                            radius: 24,
+                            backgroundColor: AppColors.primary.withOpacity(0.2),
+                            backgroundImage: (otherUser?.avatarUrl ?? '').isNotEmpty
+                                ? NetworkImage(otherUser!.avatarUrl)
+                                : null,
+                            child: (otherUser?.avatarUrl ?? '').isEmpty
+                                ? Text(
+                                    (otherUser?.name ?? '?')[0].toUpperCase(),
+                                    style: AppTypography.heading2.copyWith(
+                                      color: AppColors.primary,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                        ),
+                        title: Text(
+                          otherUser?.name ?? 'Loading...',
+                          style: AppTypography.subtitle1,
+                        ),
+                        subtitle: Text(
+                          conv.lastMessage.isNotEmpty
+                              ? conv.lastMessage
+                              : 'Start a conversation',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Builder(
+                          builder: (context) {
+                            final unreadCount = controller.getUnreadCount(conv);
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  controller.formatTime(conv.lastMessageTime),
+                                  style: AppTypography.caption.copyWith(
+                                    color: unreadCount > 0 
+                                        ? AppColors.primary 
+                                        : (isDark ? AppColors.darkTextHint : AppColors.textHint),
+                                    fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
                                   ),
-                                )
-                              : null,
-                        ),
-                      ),
-                      title: Text(
-                        otherUser?.name ?? 'Loading...',
-                        style: AppTypography.subtitle1,
-                      ),
-                      subtitle: Text(
-                        conv.lastMessage.isNotEmpty
-                            ? conv.lastMessage
-                            : 'Start a conversation',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: Builder(
-                        builder: (context) {
-                          final unreadCount = controller.getUnreadCount(conv);
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                controller.formatTime(conv.lastMessageTime),
-                                style: AppTypography.caption.copyWith(
-                                  color: unreadCount > 0 
-                                      ? AppColors.primary 
-                                      : (isDark ? AppColors.darkTextHint : AppColors.textHint),
-                                  fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
                                 ),
-                              ),
-                              if (unreadCount > 0) ...[
-                                const SizedBox(height: 6),
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.error,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    unreadCount > 99 ? '99+' : unreadCount.toString(),
-                                    style: AppTypography.caption.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 10,
+                                if (unreadCount > 0) ...[
+                                  const SizedBox(height: 6),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween(begin: 0.0, end: 1.0),
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.elasticOut,
+                                    builder: (context, value, child) => Transform.scale(
+                                      scale: value,
+                                      child: child,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.error,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Text(
+                                        unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                        style: AppTypography.caption.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ],
-                            ],
+                            );
+                          }
+                        ),
+                        onTap: () {
+                          Get.toNamed(
+                            AppRoutes.chatDetailPage,
+                            arguments: {
+                              'conversationId': conv.id,
+                              'name': otherUser?.name ?? '',
+                              'avatar': otherUser?.avatarUrl ?? '',
+                              'status': 'Online',
+                              'otherUserId': otherUserId,
+                            },
                           );
-                        }
+                        },
                       ),
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.chatDetailPage,
-                          arguments: {
-                            'conversationId': conv.id,
-                            'name': otherUser?.name ?? '',
-                            'avatar': otherUser?.avatarUrl ?? '',
-                            'status': 'Online',
-                            'otherUserId': otherUserId,
-                          },
-                        );
-                      },
                     ),
                   );
                 },

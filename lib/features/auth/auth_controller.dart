@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:mini_chat/app/routes/app_routes.dart';
 import 'package:mini_chat/core/services/user_service.dart';
 
@@ -11,6 +13,8 @@ class AuthController extends GetxController {
   // ── Login Fields ──────────────────────────────────────
   final loginEmailController = TextEditingController();
   final loginPasswordController = TextEditingController();
+  final forgotPasswordEmailController = TextEditingController();
+  final forgotPasswordFormKey = GlobalKey<FormState>();
   final loginFormKey = GlobalKey<FormState>();
 
   // ── Register Fields ───────────────────────────────────
@@ -163,6 +167,82 @@ class AuthController extends GetxController {
     }
   }
 
+  // ── Social Logins ─────────────────────────────────────
+  Future<void> signInWithGoogle() async {
+    isLoading.value = true;
+    try {
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        await _userService.createUserProfile(
+          uid: userCredential.user!.uid,
+          name: userCredential.user!.displayName ?? 'User',
+          email: userCredential.user!.email ?? '',
+          avatarUrl: userCredential.user!.photoURL ?? '',
+        );
+      } else {
+        await _userService.loadCurrentUser();
+      }
+
+      Get.offAllNamed(AppRoutes.mainPage);
+    } on FirebaseAuthException catch (e) {
+      _showError(_getFirebaseErrorMessage(e.code));
+    } catch (e) {
+      _showError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> signInWithApple() async {
+    isLoading.value = true;
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final OAuthCredential credential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        final name = appleCredential.givenName != null 
+            ? '${appleCredential.givenName} ${appleCredential.familyName ?? ''}'.trim() 
+            : 'User';
+        await _userService.createUserProfile(
+          uid: userCredential.user!.uid,
+          name: name.isEmpty ? 'User' : name,
+          email: userCredential.user!.email ?? appleCredential.email ?? '',
+        );
+      } else {
+        await _userService.loadCurrentUser();
+      }
+
+      Get.offAllNamed(AppRoutes.mainPage);
+    } on FirebaseAuthException catch (e) {
+      _showError(_getFirebaseErrorMessage(e.code));
+    } catch (e) {
+      _showError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   // ── Logout ────────────────────────────────────────────
   Future<void> logout() async {
     _userService.clearUser();
@@ -223,6 +303,7 @@ class AuthController extends GetxController {
     registerEmailController.dispose();
     registerPasswordController.dispose();
     registerConfirmPasswordController.dispose();
+    forgotPasswordEmailController.dispose();
     super.onClose();
   }
 }

@@ -31,6 +31,8 @@ dependencies:
   googleapis_auth: ^1.6.0
   http: ^1.2.0
   agora_rtc_engine: ^6.2.0
+  google_sign_in: ^7.2.0
+  sign_in_with_apple: ^7.0.1
 
 dev_dependencies:
   flutter_test:

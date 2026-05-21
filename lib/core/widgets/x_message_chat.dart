@@ -4,7 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:mini_chat/core/theme/app_colors.dart';
 import 'package:mini_chat/core/theme/app_typography.dart';
 
-class XMessageChat extends StatelessWidget {
+class XMessageChat extends StatefulWidget {
   final bool isMe;
   final String message;
   final String time;
@@ -12,6 +12,8 @@ class XMessageChat extends StatelessWidget {
   final String type; // 'text', 'image', 'voice'
   final String? mediaUrl;
   final VoidCallback? onLongPress;
+  final Map<String, List<String>> reactions;
+  final void Function(String emoji)? onReactionTap;
 
   const XMessageChat({
     super.key,
@@ -22,10 +24,116 @@ class XMessageChat extends StatelessWidget {
     this.type = 'text',
     this.mediaUrl,
     this.onLongPress,
+    this.reactions = const {},
+    this.onReactionTap,
   });
 
+  @override
+  State<XMessageChat> createState() => _XMessageChatState();
+}
+
+class _XMessageChatState extends State<XMessageChat>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animCtrl;
+  late final Animation<double> _fadeAnim;
+  late final Animation<Offset> _slideAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut),
+    );
+    _slideAnim = Tween<Offset>(
+      begin: Offset(widget.isMe ? 0.15 : -0.15, 0.05),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic),
+    );
+    _animCtrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _animCtrl.dispose();
+    super.dispose();
+  }
+
+  bool get _hasReactions =>
+      widget.reactions.isNotEmpty &&
+      widget.reactions.values.any((v) => v.isNotEmpty);
+
+  List<Widget> _buildReactionBadges(bool isDark) {
+    final activeReactions = widget.reactions.entries
+        .where((e) => e.value.isNotEmpty)
+        .toList();
+
+    if (activeReactions.isEmpty) return [];
+
+    return [
+      const SizedBox(height: 2),
+      Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: activeReactions.map((entry) {
+          final emoji = entry.key;
+          final count = entry.value.length;
+
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.elasticOut,
+            builder: (context, value, child) => Transform.scale(
+              scale: value,
+              child: child,
+            ),
+            child: GestureDetector(
+              onTap: () => widget.onReactionTap?.call(emoji),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.black.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.15)
+                        : Colors.black.withOpacity(0.08),
+                    width: 0.5,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 14)),
+                    if (count > 1) ...[
+                      const SizedBox(width: 3),
+                      Text(
+                        '$count',
+                        style: AppTypography.caption.copyWith(
+                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    ];
+  }
+
   Widget _buildMessageContent(Color textColor, bool isDark) {
-    if (type == 'image' && mediaUrl != null) {
+    if (widget.type == 'image' && widget.mediaUrl != null) {
       return GestureDetector(
         onTap: () {
           Get.to(
@@ -39,9 +147,9 @@ class XMessageChat extends StatelessWidget {
                       minScale: 0.5,
                       maxScale: 4.0,
                       child: Hero(
-                        tag: mediaUrl!,
+                        tag: widget.mediaUrl!,
                         child: Image.network(
-                          mediaUrl!,
+                          widget.mediaUrl!,
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -73,9 +181,9 @@ class XMessageChat extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Hero(
-            tag: mediaUrl!,
+            tag: widget.mediaUrl!,
             child: Image.network(
-              mediaUrl!,
+              widget.mediaUrl!,
               fit: BoxFit.cover,
               width: 200,
               height: 150,
@@ -83,13 +191,13 @@ class XMessageChat extends StatelessWidget {
           ),
         ),
       );
-    } else if (type == 'voice') {
+    } else if (widget.type == 'voice') {
       return _VoiceMessagePlayer(
-        mediaUrl: mediaUrl!,
+        mediaUrl: widget.mediaUrl!,
         textColor: textColor,
-        isMe: isMe,
+        isMe: widget.isMe,
       );
-    } else if (type == 'location') {
+    } else if (widget.type == 'location') {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -100,7 +208,7 @@ class XMessageChat extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Image.network(
-                  mediaUrl ?? 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=400&q=80',
+                  widget.mediaUrl ?? 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=400&q=80',
                   fit: BoxFit.cover,
                   width: 200,
                   height: 120,
@@ -111,7 +219,7 @@ class XMessageChat extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            message.isNotEmpty ? message : "Shared Location",
+            widget.message.isNotEmpty ? widget.message : "Shared Location",
             style: AppTypography.bodyMedium.copyWith(
               color: textColor,
               fontWeight: FontWeight.w600,
@@ -123,10 +231,10 @@ class XMessageChat extends StatelessWidget {
 
     // Default to text
     return Text(
-      message,
+      widget.message,
       style: AppTypography.bodyLarge.copyWith(
         color: textColor,
-        fontStyle: type == 'deleted' ? FontStyle.italic : FontStyle.normal,
+        fontStyle: widget.type == 'deleted' ? FontStyle.italic : FontStyle.normal,
       ),
     );
   }
@@ -136,63 +244,71 @@ class XMessageChat extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Determine colors based on sender and theme
-    final bubbleColor = type == 'image' 
+    final bubbleColor = widget.type == 'image' 
         ? Colors.transparent 
-        : (isMe
+        : (widget.isMe
             ? AppColors.bubbleSent
             : (isDark ? AppColors.bubbleReceivedDark : AppColors.bubbleReceived));
     
-    final textColor = isMe
+    final textColor = widget.isMe
         ? AppColors.bubbleSentText
         : (isDark ? AppColors.bubbleReceivedTextDark : AppColors.bubbleReceivedText);
 
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.75,
-            ),
-            padding: type == 'image' 
-                ? EdgeInsets.zero 
-                : const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            decoration: type == 'image' ? null : BoxDecoration(
-              color: bubbleColor,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16.0),
-                topRight: const Radius.circular(16.0),
-                bottomLeft: Radius.circular(isMe ? 16.0 : 4.0),
-                bottomRight: Radius.circular(isMe ? 4.0 : 16.0),
-              ),
-            ),
-            child: _buildMessageContent(textColor, isDark),
-          ),
-          const SizedBox(height: 4.0),
-          Row(
-            mainAxisSize: MainAxisSize.min,
+    return FadeTransition(
+      opacity: _fadeAnim,
+      child: SlideTransition(
+        position: _slideAnim,
+        child: GestureDetector(
+          onLongPress: widget.onLongPress,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              Text(
-                time,
-                style: AppTypography.caption.copyWith(
-                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.75,
                 ),
+                padding: widget.type == 'image' 
+                    ? EdgeInsets.zero 
+                    : const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                decoration: widget.type == 'image' ? null : BoxDecoration(
+                  color: bubbleColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(16.0),
+                    topRight: const Radius.circular(16.0),
+                    bottomLeft: Radius.circular(widget.isMe ? 16.0 : 4.0),
+                    bottomRight: Radius.circular(widget.isMe ? 4.0 : 16.0),
+                  ),
+                ),
+                child: _buildMessageContent(textColor, isDark),
               ),
-              if (isMe) ...[
-                const SizedBox(width: 4.0),
-                Icon(
-                  isRead ? Icons.done_all : Icons.done,
-                  size: 16.0,
-                  color: isRead ? AppColors.primary : (isDark ? AppColors.darkTextHint : AppColors.textHint),
-                ),
-              ],
+              // ── Reaction Badges ──
+              if (_hasReactions) ..._buildReactionBadges(isDark),
+              const SizedBox(height: 4.0),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.time,
+                    style: AppTypography.caption.copyWith(
+                      color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                    ),
+                  ),
+                  if (widget.isMe) ...[
+                    const SizedBox(width: 4.0),
+                    Icon(
+                      widget.isRead ? Icons.done_all : Icons.done,
+                      size: 16.0,
+                      color: widget.isRead ? AppColors.primary : (isDark ? AppColors.darkTextHint : AppColors.textHint),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+          ),
+        ),
       ),
     );
   }

@@ -8,6 +8,7 @@ class MessageModel {
   final String? mediaUrl;
   final DateTime createdAt;
   final bool isRead;
+  final Map<String, List<String>> reactions; // emoji -> [userIds]
 
   const MessageModel({
     required this.id,
@@ -17,10 +18,20 @@ class MessageModel {
     this.mediaUrl,
     required this.createdAt,
     this.isRead = false,
+    this.reactions = const {},
   });
+
+  bool get hasReactions => reactions.isNotEmpty && reactions.values.any((v) => v.isNotEmpty);
 
   factory MessageModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
+    // Parse reactions: { "❤️": ["uid1", "uid2"], "😂": ["uid3"] }
+    final rawReactions = data['reactions'] as Map<String, dynamic>? ?? {};
+    final reactions = rawReactions.map(
+      (key, value) => MapEntry(key, List<String>.from(value ?? [])),
+    );
+
     return MessageModel(
       id: doc.id,
       senderId: data['senderId'] ?? '',
@@ -29,6 +40,7 @@ class MessageModel {
       mediaUrl: data['mediaUrl'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isRead: data['isRead'] ?? false,
+      reactions: reactions,
     );
   }
 
@@ -40,6 +52,7 @@ class MessageModel {
       'mediaUrl': mediaUrl,
       'createdAt': Timestamp.fromDate(createdAt),
       'isRead': isRead,
+      'reactions': reactions,
     };
   }
 }

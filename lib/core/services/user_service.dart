@@ -41,6 +41,7 @@ class UserService extends GetxService with WidgetsBindingObserver {
     required String uid,
     required String name,
     required String email,
+    String? avatarUrl,
   }) async {
     final user = UserModel(
       uid: uid,
@@ -49,7 +50,7 @@ class UserService extends GetxService with WidgetsBindingObserver {
       username: '@${name.toLowerCase().replaceAll(' ', '_')}',
       bio: '',
       phone: '',
-      avatarUrl: '',
+      avatarUrl: avatarUrl ?? '',
       createdAt: DateTime.now(),
     );
 
